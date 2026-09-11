@@ -1,24 +1,33 @@
 /* ============================================================
    NETRUNNER  //  Cyberpunk 2077 inspired theme for Obsidian
-   BREACH PROTOCOL // v2.1.0
-   Typeface: Rajdhani (UI + prose) / JetBrains Mono (code + math)
+   BREACH PROTOCOL // v3.0.0-rc1
+   Dark mode only. No remote resources.
+   Typeface: Rajdhani if installed locally, system sans otherwise.
    ------------------------------------------------------------
-   01 palette + type tokens      14 toggles
-   02 typography sweep           15 tables
-   03 ambient grid + scanlines   16 hr + resize handle guard
-   04 layout + alignment lock    17 modals / prompt
-   05 top chrome                 18 buttons + inputs
-   06 sidenav                    19 status bar
-   07 headings                   20 scrollbars
-   08 body copy                  21 cursor + selection
-   09 links / tags / marks       22 graph view
-   10 code                       23 embeds / images / canvas
-   11 math                       24 h1 glitch
-   12 quotes + callouts          25 light fallback
-   13 lists + task checkboxes
+   01 palette + type tokens      14 tables
+   02 ambient grid + scanlines   15 hr + resize handle guard
+   03 layout + alignment lock    16 modals / prompt
+   04 top chrome                 17 buttons + inputs
+   05 sidenav                    18 status bar
+   06 headings                   19 scrollbars
+   07 body copy                  20 cursor + selection
+   08 links / tags / marks       21 graph view
+   09 code                       22 embeds + images
+   10 math                       23 h1 glitch
+   11 quotes + callouts          24 glitch on hover
+   12 lists + task checkboxes    25 canvas
+   13 toggles                    26 mobile
+   ------------------------------------------------------------
+   FRAGILE — read the comment before editing:
+     §15  hr is scoped to content; Obsidian's resize handles
+          are <hr> and break the sidebar layout if styled
+     §12  checkboxes are scoped to markdown; settings toggles
+          use the same tag and misalign if caught
+     §05c nav row font-size/line-height are pinned; the file
+          tree is virtualized and desyncs if they change
+     §25c --canvas-color must be set at body level to reach
+          the SVG <marker> that draws canvas arrowheads
    ============================================================ */
-
-@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap');
 
 
 /* ============================================================
@@ -54,16 +63,21 @@
   --nr-text-dim:    #8494a1;
   --nr-text-faint:  #4d5b68;
 
-  /* typography */
-  --nr-sans:    'Rajdhani', -apple-system, BlinkMacSystemFont, sans-serif;
-  --nr-mono:    'JetBrains Mono', 'IBM Plex Mono', ui-monospace, monospace;
+  /* typography — no webfont is loaded. Rajdhani is used if the
+     user has it installed; otherwise the stack falls through to
+     narrow-ish system faces. 17px suits the fallback; if you
+     have Rajdhani installed, 19px matches its small x-height. */
+  --nr-sans: 'Rajdhani', 'Saira Condensed', 'Archivo Narrow',
+             -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --nr-mono: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace,
+             SFMono-Regular, Menlo, Consolas, monospace;
   --nr-h-weight: 700;              /* master dial for heading heft */
 
   --font-text-theme:      var(--nr-sans);
   --font-interface-theme: var(--nr-sans);
   --font-monospace-theme: var(--nr-mono);
 
-  --font-text-size: 19px;          /* Rajdhani has a small x-height */
+  --font-text-size: 17px;
   --line-height-normal: 1.68;
 
   /* obsidian surfaces */
@@ -138,63 +152,7 @@
 
 
 /* ============================================================
-   02 // TYPOGRAPHY SWEEP
-   Rajdhani everywhere; mono survives in code + math only.
-   ============================================================ */
-.theme-dark body,
-.theme-dark input,
-.theme-dark textarea,
-.theme-dark button,
-.theme-dark select,
-.theme-dark .markdown-preview-view,
-.theme-dark .markdown-rendered,
-.theme-dark .cm-editor,
-.theme-dark .cm-s-obsidian,
-.theme-dark .menu,
-.theme-dark .tooltip,
-.theme-dark .modal,
-.theme-dark .prompt,
-.theme-dark .prompt-input,
-.theme-dark .suggestion-item,
-.theme-dark .setting-item-name,
-.theme-dark .setting-item-description,
-.theme-dark .nav-file-title,
-.theme-dark .nav-folder-title,
-.theme-dark .tree-item-self,
-.theme-dark .view-header-title,
-.theme-dark .workspace-tab-header,
-.theme-dark .status-bar,
-.theme-dark .status-bar-item,
-.theme-dark .tag,
-.theme-dark a.tag,
-.theme-dark table,
-.theme-dark thead th,
-.theme-dark .callout-title,
-.theme-dark .inline-title,
-.theme-dark h1, .theme-dark h2, .theme-dark h3,
-.theme-dark h4, .theme-dark h5, .theme-dark h6,
-.theme-dark .HyperMD-header {
-  font-family: var(--nr-sans) !important;
-}
-
-.theme-dark code,
-.theme-dark pre,
-.theme-dark pre code,
-.theme-dark .cm-inline-code,
-.theme-dark .HyperMD-codeblock,
-.theme-dark .cm-s-obsidian .cm-formatting-code,
-.theme-dark .math,
-.theme-dark .MathJax,
-.theme-dark mjx-container,
-.theme-dark .cm-s-obsidian .cm-math,
-.theme-dark .metadata-property-key input,
-.theme-dark .cm-hmd-frontmatter {
-  font-family: var(--nr-mono) !important;
-}
-
-
-/* ============================================================
-   03 // AMBIENT GRID + SCANLINES
+   02 // AMBIENT GRID + SCANLINES
    ============================================================ */
 .theme-dark body,
 .theme-dark .app-container {
@@ -235,7 +193,7 @@
 
 
 /* ============================================================
-   04 // LAYOUT + ALIGNMENT LOCK
+   03 // LAYOUT + ALIGNMENT LOCK
    Every header row shares one box model so the rules under the
    sidebar and the main pane land on the same pixel.
    ============================================================ */
@@ -251,7 +209,7 @@
   justify-content: flex-start;
 }
 
-/* ---- 04a // header rows: identical geometry ---- */
+/* ---- 03a // header rows: identical geometry ---- */
 .theme-dark .workspace-tab-header-container,
 .theme-dark .view-header,
 .theme-dark .nav-header {
@@ -277,7 +235,7 @@
   margin: 0 !important;
 }
 
-/* ---- 04b // no stray offsets above the first row ---- */
+/* ---- 03b // no stray offsets above the first row ---- */
 .theme-dark .workspace-tab-container > .workspace-leaf,
 .theme-dark .workspace-split.mod-root .workspace-leaf-content,
 .theme-dark .workspace-split.mod-left-split .workspace-leaf-content,
@@ -287,25 +245,9 @@
   border-top: none !important;
 }
 
-/* ---- 04c // one surface, no warm/cool split ---- */
-.theme-dark .workspace-leaf-content,
-.theme-dark .markdown-source-view,
-.theme-dark .markdown-reading-view,
-.theme-dark .markdown-preview-view,
-.theme-dark .cm-editor,
-.theme-dark .cm-scroller,
-.theme-dark .cm-gutters {
-  background: var(--nr-black) !important;
-}
-
-.theme-dark .markdown-source-view.mod-cm6 .cm-content,
-.theme-dark .cm-contentContainer {
-  background: transparent !important;
-}
-
 
 /* ============================================================
-   05 // TOP CHROME  //  2077 menu bar
+   04 // TOP CHROME  //  2077 menu bar
    flat text tabs — red inactive, cyan active, no containers
    ============================================================ */
 .theme-dark {
@@ -324,14 +266,12 @@
   --tab-text-color-focused-highlighted:    var(--nr-tab-hover);
 }
 
-/* ---- 05a // STRIP ---- */
+/* ---- 04a // STRIP ---- */
 .theme-dark .workspace-tab-header-container {
   position: relative;
-  background: linear-gradient(180deg, var(--nr-chrome-top) 0%, var(--nr-black) 100%) !important;
+  background: linear-gradient(180deg, var(--nr-chrome-top) 0%, var(--nr-black) 100%);
   border-bottom: 1px solid rgba(255, 46, 76, 0.18) !important;
-  box-shadow: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
+  box-shadow: none;
 }
 
 .theme-dark .workspace-tab-header-container::before,
@@ -343,35 +283,32 @@
   align-items: center;
 }
 
-/* ---- 05b // TABS ---- */
+/* ---- 04b // TABS ---- */
 .theme-dark .workspace-tab-header {
-  background: transparent !important;
-  border: none !important;
-  border-left: none !important;
-  border-right: none !important;
-  box-shadow: none !important;
-  clip-path: none !important;
-  border-radius: 0 !important;
-  color: var(--nr-tab-idle) !important;
+  background: none;
+  border: none;
+  box-shadow: none;
+  clip-path: none;
+  border-radius: 0;
   transition: color 110ms linear, text-shadow 110ms linear;
 }
 
 .theme-dark .workspace-tab-header-inner {
-  background-color: transparent !important;
-  box-shadow: none !important;
+  background-color: transparent;
+  box-shadow: none;
   padding-inline: 14px;
 }
 
 .theme-dark .workspace-tab-header-inner-title {
   font-weight: 600;
-  color: inherit !important;
+  color: inherit;
   text-shadow: 0 0 8px rgba(255, 46, 76, 0.22);
 }
 
 .theme-dark .workspace-tab-header-inner-icon,
 .theme-dark .workspace-tab-header-inner-icon svg,
 .theme-dark .workspace-tab-header-inner-icon .svg-icon {
-  color: inherit !important;
+  color: inherit;
   transition: color 110ms linear, filter 110ms linear;
 }
 
@@ -379,12 +316,7 @@
   filter: drop-shadow(0 0 6px rgba(255, 46, 76, 0.22));
 }
 
-/* ---- 05c // HOVER ---- */
-.theme-dark .workspace-tab-header:not(.is-active):hover {
-  background: transparent !important;
-  color: var(--nr-tab-hover) !important;
-}
-
+/* ---- 04c // HOVER ---- */
 .theme-dark .workspace-tab-header:not(.is-active):hover .workspace-tab-header-inner-title {
   text-shadow: 0 0 10px rgba(255, 46, 76, 0.55);
 }
@@ -393,20 +325,10 @@
   filter: drop-shadow(0 0 7px rgba(255, 46, 76, 0.5));
 }
 
-/* ---- 05d // ACTIVE ---- */
-.theme-dark .workspace-tab-header.is-active,
-.theme-dark .workspace-tab-header.is-active.mod-active,
-.theme-dark .workspace-tab-header.mod-active,
-.theme-dark .workspace-tabs.mod-active .workspace-tab-header.is-active,
-.theme-dark .workspace-tabs.mod-active .workspace-tab-header.is-active.mod-active {
-  background: transparent !important;
-  box-shadow: none !important;
-  color: var(--nr-tab-active) !important;
-}
-
+/* ---- 04d // ACTIVE ---- */
 .theme-dark .workspace-tab-header.is-active .workspace-tab-header-inner-title,
 .theme-dark .workspace-tab-header.mod-active .workspace-tab-header-inner-title {
-  color: inherit !important;
+  color: inherit;
   font-weight: 700;
   text-shadow:
     0 0 10px rgba(34, 224, 245, 0.55),
@@ -415,11 +337,11 @@
 
 .theme-dark .workspace-tab-header.is-active .workspace-tab-header-inner-icon,
 .theme-dark .workspace-tab-header.mod-active .workspace-tab-header-inner-icon {
-  color: inherit !important;
+  color: inherit;
   filter: drop-shadow(0 0 7px rgba(34, 224, 245, 0.7));
 }
 
-/* ---- 05e // CLOSE BUTTON ---- */
+/* ---- 04e // CLOSE BUTTON ---- */
 .theme-dark .workspace-split.mod-root .workspace-tab-header-inner-close-button {
   opacity: 0;
   transition: opacity 110ms linear;
@@ -431,7 +353,7 @@
   color: var(--nr-red);
 }
 
-/* ---- 05f // STRIP CONTROLS ---- */
+/* ---- 04f // STRIP CONTROLS ---- */
 .theme-dark .workspace-tab-header-new-tab .clickable-icon,
 .theme-dark .workspace-tab-header-tab-list .clickable-icon,
 .theme-dark .sidebar-toggle-button .clickable-icon {
@@ -447,7 +369,10 @@
   filter: drop-shadow(0 0 7px rgba(34, 224, 245, 0.7));
 }
 
-/* ---- 05g // DIVIDERS: always on, state-independent ---- */
+/* ---- 04g // DIVIDERS: always on, state-independent ----
+   Obsidian hides its own separators either side of the active
+   tab; these are drawn as a background-image on the inner
+   element so they never depend on state. ---- */
 .theme-dark .workspace-tab-header::before,
 .theme-dark .workspace-tab-header::after,
 .theme-dark .workspace-tab-header-inner::before,
@@ -464,18 +389,17 @@
     var(--nr-tab-divider) 22%,
     var(--nr-tab-divider) 78%,
     transparent 78%
-  ) !important;
-  background-size: 1px 100% !important;
-  background-position: left center !important;
-  background-repeat: no-repeat !important;
+  );
+  background-size: 1px 100%;
+  background-position: left center;
+  background-repeat: no-repeat;
 }
 
-/* ---- 05h // VIEW HEADER + BREADCRUMBS ---- */
+/* ---- 04h // VIEW HEADER + BREADCRUMBS ---- */
 .theme-dark .view-header {
-  background: linear-gradient(180deg, #100709 0%, var(--nr-black) 100%) !important;
+  background: linear-gradient(180deg, #100709 0%, var(--nr-black) 100%);
   border-bottom: 1px solid rgba(34, 224, 245, 0.40) !important;
-  box-shadow: 0 1px 10px rgba(34, 224, 245, 0.10) !important;
-  backdrop-filter: none !important;
+  box-shadow: 0 1px 10px rgba(34, 224, 245, 0.10);
 }
 
 .theme-dark .view-header-title {
@@ -500,24 +424,18 @@
   color: rgba(255, 46, 76, 0.35);
 }
 
-/* ---- 05i // TITLEBAR ---- */
+/* ---- 04i // TITLEBAR ---- */
 .theme-dark .titlebar {
-  background: var(--nr-black) !important;
+  background: var(--nr-black);
   border-bottom: none;
 }
 
-/* ---- 05j // OPTIONAL: hide tab icons in the main area ----
-.theme-dark .workspace-split.mod-root .workspace-tab-header-inner-icon {
-  display: none !important;
-}
-*/
-
 
 /* ============================================================
-   06 // SIDENAV  //  same language, vertical
+   05 // SIDENAV  //  same language, vertical
    ============================================================ */
 .theme-dark {
-  --nr-nav-folder:       rgba(252, 238, 10, 0.92);   /* yellow */
+  --nr-nav-folder:       rgba(252, 238, 10, 0.92);
   --nr-nav-folder-hover: #fff45c;
   --nr-nav-file:         rgba(255, 46, 76, 0.60);
   --nr-nav-hover:        #ff7d90;
@@ -539,22 +457,11 @@
   --nav-item-weight-active: 700;
 }
 
-
-/* ---- 06a // PANEL ---- */
-.theme-dark .workspace-split.mod-left-split,
-.theme-dark .workspace-split.mod-right-split {
-  background: var(--nr-black) !important;
-}
-
-.theme-dark .nav-files-container,
-.theme-dark .workspace-leaf-content[data-type="file-explorer"] {
-  background: var(--nr-black) !important;
-}
-
+/* ---- 05a // PANEL ---- */
 .theme-dark .nav-header {
-  background: linear-gradient(180deg, var(--nr-chrome-top) 0%, var(--nr-black) 100%) !important;
+  background: linear-gradient(180deg, var(--nr-chrome-top) 0%, var(--nr-black) 100%);
   border-bottom: 1px solid rgba(34, 224, 245, 0.40) !important;
-  box-shadow: 0 1px 10px rgba(34, 224, 245, 0.10) !important;
+  box-shadow: 0 1px 10px rgba(34, 224, 245, 0.10);
 }
 
 .theme-dark .nav-buttons-container {
@@ -564,50 +471,78 @@
   gap: 4px;
 }
 
-/* ---- 06b // HEADER ACTION ICONS ---- */
+/* ---- 05b // HEADER ACTION ICONS ---- */
 .theme-dark .nav-buttons-container .clickable-icon,
 .theme-dark .nav-action-button {
-  color: rgba(255, 46, 76, 0.62) !important;
+  color: rgba(255, 46, 76, 0.62);
   transition: color 110ms linear, filter 110ms linear;
 }
 
 .theme-dark .nav-buttons-container .clickable-icon:hover,
 .theme-dark .nav-action-button:hover {
-  color: var(--nr-nav-active) !important;
-  background: transparent !important;
+  color: var(--nr-nav-active);
+  background: transparent;
   filter: drop-shadow(0 0 7px rgba(34, 224, 245, 0.65));
 }
 
 .theme-dark .nav-action-button.is-active {
-  color: var(--nr-nav-active) !important;
+  color: var(--nr-nav-active);
   filter: drop-shadow(0 0 6px rgba(34, 224, 245, 0.5));
 }
 
-/* ---- 06c // folders now yellow ---- */
+/* ---- 05c // ROWS ----
+   FRAGILE: font-size and line-height are pinned to Obsidian's
+   own variables. The file tree is virtualized — it measures row
+   height once and computes scroll offsets from it. Changing
+   either value leaves a large empty block above the tree. ---- */
+.theme-dark .nav-file-title,
+.theme-dark .nav-folder-title,
+.theme-dark .tree-item-self {
+  border-radius: 0;
+  border: none;
+  background: transparent;
+  box-shadow: inset 2px 0 0 transparent;
+  font-size: var(--nav-item-size) !important;
+  line-height: var(--line-height-tight) !important;
+  letter-spacing: 0;
+  text-transform: none;
+  transition: color 110ms linear, box-shadow 110ms linear, text-shadow 110ms linear;
+}
+
+.theme-dark .nav-file-title {
+  font-weight: 500;
+}
+
 .theme-dark .nav-folder-title {
-  color: var(--nr-nav-folder) !important;
+  color: var(--nr-nav-folder);
   font-weight: 700;
   text-shadow: 0 0 9px rgba(252, 238, 10, 0.18);
 }
 
-/* ---- 06d // HOVER ---- */
+.theme-dark .tree-item-icon,
+.theme-dark .tree-item-icon svg,
+.theme-dark .collapse-icon,
+.theme-dark .collapse-icon svg {
+  color: inherit;
+  opacity: 0.7;
+}
+
+/* ---- 05d // HOVER ---- */
 .theme-dark .nav-file-title:hover,
 .theme-dark .tree-item-self:hover {
-  background: transparent !important;
-  color: var(--nr-nav-hover) !important;
+  background: transparent;
   box-shadow: inset 2px 0 0 rgba(255, 46, 76, 0.65);
   text-shadow: 0 0 9px rgba(255, 46, 76, 0.45);
 }
 
-/* folders hover yellow, not red */
 .theme-dark .nav-folder-title:hover {
-  background: transparent !important;
-  color: var(--nr-nav-folder-hover) !important;
+  background: transparent;
+  color: var(--nr-nav-folder-hover);
   box-shadow: inset 2px 0 0 rgba(252, 238, 10, 0.70);
   text-shadow: 0 0 10px rgba(252, 238, 10, 0.50);
 }
 
-/* ---- 06e // ACTIVE: cyan text + full-row cyan wash ---- */
+/* ---- 05e // ACTIVE: cyan text + full-row cyan wash ---- */
 .theme-dark .nav-file-title.is-active,
 .theme-dark .tree-item-self.is-active,
 .theme-dark .tree-item-self.has-focus,
@@ -617,47 +552,50 @@
     rgba(34, 224, 245, 0.22) 0%,
     rgba(34, 224, 245, 0.13) 55%,
     rgba(34, 224, 245, 0.08) 100%
-  ) !important;
-  color: var(--nr-nav-active) !important;
+  );
+  color: var(--nr-nav-active);
   font-weight: 700;
   box-shadow:
     inset 2px 0 0 var(--nr-nav-active),
-    0 0 18px rgba(34, 224, 245, 0.10) !important;
+    0 0 18px rgba(34, 224, 245, 0.10);
+  text-shadow:
+    0 0 10px rgba(34, 224, 245, 0.55),
+    0 0 22px rgba(34, 224, 245, 0.20);
 }
 
 .theme-dark .nav-file-title.is-active .tree-item-inner,
 .theme-dark .tree-item-self.is-active .tree-item-inner {
-  color: inherit !important;
+  color: inherit;
 }
 
-/* ---- 06f // RIBBON ---- */
+/* ---- 05f // RIBBON ---- */
 .theme-dark .workspace-ribbon {
-  background: #080407 !important;
-  border-right: 1px solid rgba(255, 46, 76, 0.18) !important;
-  box-shadow: none !important;
+  background: #080407;
+  border-right: 1px solid rgba(255, 46, 76, 0.18);
+  box-shadow: none;
 }
 
 .theme-dark .side-dock-ribbon-action,
 .theme-dark .workspace-ribbon .clickable-icon {
-  color: rgba(255, 46, 76, 0.58) !important;
+  color: rgba(255, 46, 76, 0.58);
   transition: color 110ms linear, filter 110ms linear;
 }
 
 .theme-dark .side-dock-ribbon-action:hover,
 .theme-dark .workspace-ribbon .clickable-icon:hover {
-  color: var(--nr-nav-active) !important;
-  background: transparent !important;
+  color: var(--nr-nav-active);
+  background: transparent;
   filter: drop-shadow(0 0 8px rgba(34, 224, 245, 0.7));
 }
 
 .theme-dark .side-dock-ribbon-action.is-active {
-  color: var(--nr-nav-active) !important;
+  color: var(--nr-nav-active);
   filter: drop-shadow(0 0 6px rgba(34, 224, 245, 0.55));
 }
 
-/* ---- 06g // VAULT PROFILE ---- */
+/* ---- 05g // VAULT PROFILE ---- */
 .theme-dark .workspace-sidedock-vault-profile {
-  background: #080407 !important;
+  background: #080407;
   border-top: 1px solid rgba(255, 46, 76, 0.18);
 }
 
@@ -681,23 +619,23 @@
   filter: drop-shadow(0 0 7px rgba(34, 224, 245, 0.6));
 }
 
-/* ---- 06h // SIDEBAR SEARCH FIELD ---- */
+/* ---- 05h // SIDEBAR SEARCH FIELD ---- */
 .theme-dark .workspace-split.mod-left-split .search-input-container input,
 .theme-dark .workspace-split.mod-right-split .search-input-container input {
-  background: #0d060a !important;
-  border: 1px solid rgba(255, 46, 76, 0.25) !important;
-  border-radius: 0 !important;
+  background: #0d060a;
+  border: 1px solid rgba(255, 46, 76, 0.25);
+  border-radius: 0;
   color: var(--nr-text);
 }
 
 .theme-dark .workspace-split.mod-left-split .search-input-container input:focus {
-  border-color: var(--nr-nav-active) !important;
+  border-color: var(--nr-nav-active);
   box-shadow: 0 0 12px rgba(34, 224, 245, 0.20);
 }
 
 
 /* ============================================================
-   07 // HEADINGS  //  natural case, bolder + larger
+   06 // HEADINGS  //  natural case, bolder + larger
    ============================================================ */
 .theme-dark .inline-title,
 .theme-dark .markdown-preview-view h1,
@@ -784,7 +722,7 @@
 
 
 /* ============================================================
-   08 // BODY COPY + EMPHASIS
+   07 // BODY COPY + EMPHASIS
    ============================================================ */
 .theme-dark .markdown-preview-view,
 .theme-dark .markdown-source-view.mod-cm6 .cm-line {
@@ -793,7 +731,8 @@
   line-height: 1.68;
 }
 
-/* Rajdhani ships no true italic — synthesized, so reinforce with color */
+/* Rajdhani has no true italic — it's synthesized, so emphasis is
+   reinforced with colour to stay legible either way */
 .theme-dark em,
 .theme-dark .cm-em {
   font-style: italic;
@@ -809,7 +748,7 @@
 
 
 /* ============================================================
-   09 // LINKS, TAGS, MARKS
+   08 // LINKS, TAGS, MARKS
    ============================================================ */
 .theme-dark a.internal-link,
 .theme-dark .cm-hmd-internal-link {
@@ -862,7 +801,7 @@
 
 
 /* ============================================================
-   10 // CODE
+   09 // CODE
    ============================================================ */
 .theme-dark code {
   background: var(--nr-code-bg);
@@ -893,16 +832,22 @@
   opacity: 0.85;
 }
 
-.theme-dark .cm-keyword,     .theme-dark .token.keyword     { color: var(--nr-red-hot) !important; }
-.theme-dark .cm-string,      .theme-dark .token.string      { color: var(--nr-yellow) !important; }
-.theme-dark .cm-number,      .theme-dark .token.number      { color: #ff8a5c !important; }
-.theme-dark .cm-comment,     .theme-dark .token.comment     { color: var(--nr-text-faint) !important; font-style: italic; }
-.theme-dark .cm-def,         .theme-dark .token.function    { color: var(--nr-cyan) !important; }
-.theme-dark .token.operator, .theme-dark .token.punctuation { color: var(--nr-text-dim) !important; }
+.theme-dark .cm-s-obsidian .cm-keyword,
+.theme-dark .markdown-rendered .token.keyword     { color: var(--nr-red-hot); }
+.theme-dark .cm-s-obsidian .cm-string,
+.theme-dark .markdown-rendered .token.string      { color: var(--nr-yellow); }
+.theme-dark .cm-s-obsidian .cm-number,
+.theme-dark .markdown-rendered .token.number      { color: #ff8a5c; }
+.theme-dark .cm-s-obsidian .cm-comment,
+.theme-dark .markdown-rendered .token.comment     { color: var(--nr-text-faint); font-style: italic; }
+.theme-dark .cm-s-obsidian .cm-def,
+.theme-dark .markdown-rendered .token.function    { color: var(--nr-cyan); }
+.theme-dark .markdown-rendered .token.operator,
+.theme-dark .markdown-rendered .token.punctuation { color: var(--nr-text-dim); }
 
 
 /* ============================================================
-   11 // MATH
+   10 // MATH
    ============================================================ */
 .theme-dark .math,
 .theme-dark mjx-container {
@@ -918,7 +863,7 @@
 
 
 /* ============================================================
-   12 // BLOCKQUOTES + CALLOUTS
+   11 // BLOCKQUOTES + CALLOUTS
    ============================================================ */
 .theme-dark blockquote {
   background: linear-gradient(90deg, rgba(255,46,76,0.07), transparent 70%);
@@ -961,8 +906,11 @@
 
 
 /* ============================================================
-   13 // LISTS + TASK CHECKBOXES
-   scoped to markdown — the settings toggle uses the same tag
+   12 // LISTS + TASK CHECKBOXES
+   FRAGILE: scoped to markdown. Obsidian's settings toggle is a
+   <label class="checkbox-container"><input type="checkbox">, so
+   an unscoped input rule un-hides that input and knocks the
+   toggle's thumb out of alignment. See §13.
    ============================================================ */
 .theme-dark ul > li::marker { color: var(--nr-red); }
 .theme-dark ol > li::marker { color: var(--nr-cyan); font-variant-numeric: tabular-nums; }
@@ -1003,8 +951,11 @@
 
 
 /* ============================================================
-   14 // TOGGLES  //  HUD switch
-   container = outline, input = interior fill, ::after = thumb
+   13 // TOGGLES  //  HUD switch
+   Three layers: the container is the outline, the input is
+   repurposed as the interior fill (1px inset so the chamfered
+   diagonal gets stroked like every other edge), and ::after is
+   the sliding thumb.
    ============================================================ */
 .theme-dark {
   --nr-tgl-w:     52px;
@@ -1040,7 +991,6 @@
 .theme-dark .checkbox-container:hover      { background: var(--nr-red) !important; }
 .theme-dark .checkbox-container.is-enabled { background: var(--nr-cyan) !important; }
 
-/* interior fill: the otherwise-invisible input, repurposed */
 .theme-dark .checkbox-container input[type="checkbox"] {
   appearance: none !important;
   -webkit-appearance: none !important;
@@ -1112,7 +1062,7 @@
 
 
 /* ============================================================
-   15 // TABLES
+   14 // TABLES
    ============================================================ */
 .theme-dark table {
   border-collapse: collapse;
@@ -1128,7 +1078,7 @@
   font-weight: 700;
   text-transform: none;
   letter-spacing: 0;
-  border-bottom: 1px solid var(--nr-cyan-dim) !important;
+  border-bottom: 1px solid var(--nr-cyan-dim);
 }
 
 .theme-dark tbody tr:hover {
@@ -1138,8 +1088,11 @@
 
 
 /* ============================================================
-   16 // HR  //  content only
-   Obsidian's split resize handles are <hr> — never style globally
+   15 // HR  //  content only
+   FRAGILE: Obsidian implements split resize handles as <hr>
+   elements. A global hr rule pulls them into normal flow and
+   stacks their margins, producing a large empty block in the
+   sidebar. Never style hr unscoped.
    ============================================================ */
 .theme-dark .markdown-preview-view hr,
 .theme-dark .markdown-rendered hr,
@@ -1182,7 +1135,7 @@
 
 
 /* ============================================================
-   17 // MODALS, PROMPT, SUGGESTIONS
+   16 // MODALS, PROMPT, SUGGESTIONS
    ============================================================ */
 .theme-dark .modal,
 .theme-dark .prompt {
@@ -1215,7 +1168,7 @@
 
 
 /* ============================================================
-   18 // BUTTONS + INPUTS
+   17 // BUTTONS + INPUTS
    ============================================================ */
 .theme-dark button,
 .theme-dark .clickable-icon {
@@ -1273,7 +1226,7 @@
 
 
 /* ============================================================
-   19 // STATUS BAR
+   18 // STATUS BAR
    ============================================================ */
 .theme-dark .status-bar {
   background: var(--nr-void);
@@ -1298,12 +1251,11 @@
 
 
 /* ============================================================
-   20 // SCROLLBARS
+   19 // SCROLLBARS
+   Obsidian sets `scrollbar-color` on body. In Chromium 121+ any
+   non-auto value disables ::-webkit-scrollbar styling entirely,
+   so it has to be reset first.
    ============================================================ */
-
-/* Obsidian sets `scrollbar-color` on body, which in Chromium 121+
-   disables ::-webkit-scrollbar styling entirely. Reset it to auto
-   so the rules below actually apply. */
 body.theme-dark:not(.styled-scrollbars),
 body.theme-dark.styled-scrollbars {
   scrollbar-color: auto !important;
@@ -1312,23 +1264,10 @@ body.theme-dark.styled-scrollbars {
 
 .theme-dark ::-webkit-scrollbar { width: 9px; height: 9px; }
 
-.theme-dark ::-webkit-scrollbar-thumb {
-  background: rgba(255, 46, 76, 0.28);
-  border-radius: 0;
-  border-left: 1px solid var(--nr-red-deep);
-}
-
-.theme-dark ::-webkit-scrollbar-thumb:hover {
-  background: var(--nr-red);
-  box-shadow: 0 0 10px var(--nr-red);
-}
-
 .theme-dark ::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.theme-dark ::-webkit-scrollbar { width: 9px; height: 9px; }
-
 .theme-dark ::-webkit-scrollbar-thumb {
   background: rgba(255, 46, 76, 0.28);
   border-radius: 0;
@@ -1340,9 +1279,16 @@ body.theme-dark.styled-scrollbars {
   box-shadow: 0 0 10px var(--nr-red);
 }
 
+.theme-dark .canvas-node-content ::-webkit-scrollbar { width: 5px; }
+
+.theme-dark .canvas-node-content ::-webkit-scrollbar-thumb {
+  background: rgba(255, 46, 76, 0.18);
+  border-left: none;
+}
+
 
 /* ============================================================
-   21 // CURSOR + SELECTION
+   20 // CURSOR + SELECTION
    ============================================================ */
 .theme-dark {
   --nr-line-bleed: 12px;        /* how far the active-line highlight
@@ -1350,7 +1296,7 @@ body.theme-dark.styled-scrollbars {
   --caret-color: var(--nr-red);
 }
 
-/* ---- 21a // DRAWN CURSOR (CodeMirror) ----
+/* ---- 20a // DRAWN CURSOR (CodeMirror) ----
    A real DOM element, so it can glow and blink. Rendered whenever
    the editor has focus, not only while a selection exists. */
 .theme-dark .cm-editor .cm-cursor,
@@ -1365,12 +1311,11 @@ body.theme-dark.styled-scrollbars {
   animation: nr-blink 1.1s steps(1) infinite;
 }
 
-/* keep unfocused panes quiet */
 .theme-dark .cm-editor:not(.cm-focused) .cm-cursorLayer {
   display: none;
 }
 
-/* suppress the native caret in the editor so there's only one bar */
+/* one bar only — suppress the native caret in the editor */
 .theme-dark .cm-content {
   caret-color: transparent;
 }
@@ -1380,24 +1325,21 @@ body.theme-dark.styled-scrollbars {
   56%, 100% { opacity: 0.15; }
 }
 
-/* ---- 21b // NATIVE CARET everywhere else ----
+/* ---- 20b // NATIVE CARET everywhere else ----
    Native carets accept a colour only — no glow, no custom blink. */
 .theme-dark input,
 .theme-dark textarea,
-.theme-dark input[type="text"],
-.theme-dark input[type="search"],
 .theme-dark .prompt-input,
 .theme-dark [contenteditable="true"] {
   caret-color: var(--nr-red);
 }
 
-/* ---- 21c // SELECTION ---- */
+/* ---- 20c // SELECTION ---- */
 .theme-dark ::selection {
   background: rgba(255, 46, 76, 0.30);
   text-shadow: 0 0 8px rgba(255, 46, 76, 0.7);
 }
 
-.theme-dark .cm-selectionBackground,
 .theme-dark .cm-editor .cm-selectionBackground {
   background: rgba(255, 46, 76, 0.26) !important;
 }
@@ -1406,9 +1348,10 @@ body.theme-dark.styled-scrollbars {
   background: rgba(255, 46, 76, 0.32) !important;
 }
 
-/* ---- 21d // ACTIVE LINE ----
-   Bled leftward with an outset shadow + absolute bar, so the line's
-   box model is untouched and text never shifts between lines. */
+/* ---- 20d // ACTIVE LINE ----
+   Bled leftward with an outset shadow plus an absolute bar, so
+   the line's box model is untouched and text never shifts as the
+   cursor moves between lines. */
 .theme-dark .cm-active.cm-line {
   position: relative;
   background: rgba(255, 46, 76, 0.045);
@@ -1429,8 +1372,10 @@ body.theme-dark.styled-scrollbars {
 
 
 /* ============================================================
-   22 // GRAPH VIEW  //  monowire
+   21 // GRAPH VIEW  //  monowire
    Links: yellow, bloomed. Nodes: red. Tags: cyan.
+   The bloom is five filter passes over a repainting canvas — if
+   large graphs stutter, cut the last two drop-shadows.
    ============================================================ */
 .theme-dark {
   --graph-line:            #fcee0a;
@@ -1455,7 +1400,7 @@ body.theme-dark.styled-scrollbars {
 
 .theme-dark .workspace-leaf-content[data-type="graph"] .view-content,
 .theme-dark .workspace-leaf-content[data-type="localgraph"] .view-content {
-  background: radial-gradient(ellipse at 50% 45%, #0d070c 0%, #050208 72%) !important;
+  background: radial-gradient(ellipse at 50% 45%, #0d070c 0%, #050208 72%);
 }
 
 .theme-dark .workspace-leaf-content[data-type="graph"] canvas,
@@ -1483,8 +1428,12 @@ body.theme-dark.styled-scrollbars {
   background: rgba(252, 238, 10, 0.12);
 }
 
+
 /* ============================================================
-   23 // EMBEDS, IMAGES, CANVAS
+   22 // EMBEDS + IMAGES
+   The :not() excludes canvas cards — those carry markdown-embed
+   on the same element as canvas-node-content, so an unscoped
+   rule puts a cyan bar down the left edge of every card.
    ============================================================ */
 .theme-dark .markdown-embed:not(.canvas-node-content) {
   border: 1px solid var(--nr-line);
@@ -1499,8 +1448,9 @@ body.theme-dark.styled-scrollbars {
   filter: saturate(1.15) contrast(1.05);
 }
 
+
 /* ============================================================
-   24 // GLITCH ON H1 HOVER
+   23 // GLITCH ON H1 HOVER
    ============================================================ */
 .theme-dark .markdown-preview-view h1:hover {
   animation: nr-glitch 320ms steps(2) 1;
@@ -1516,19 +1466,7 @@ body.theme-dark.styled-scrollbars {
 
 
 /* ============================================================
-   25 // LIGHT MODE FALLBACK (minimal — this theme is dark)
-   ============================================================ */
-.theme-light {
-  --font-text-theme:      'Rajdhani', sans-serif;
-  --font-interface-theme: 'Rajdhani', sans-serif;
-  --font-monospace-theme: 'JetBrains Mono', monospace;
-  --interactive-accent: #b8102b;
-  --text-accent: #b8102b;
-  --link-color: #067a8c;
-  --radius-s: 0px; --radius-m: 0px; --radius-l: 0px;
-}
-/* ============================================================
-   29 // GLITCH ON HOVER  //  non-selected nav items
+   24 // GLITCH ON HOVER  //  non-selected nav items
    Three layers, deliberately out of phase:
      label  900ms  chromatic jitter via text-shadow
      icon   780ms  chromatic split via drop-shadow + flicker
@@ -1536,9 +1474,7 @@ body.theme-dark.styled-scrollbars {
    Runs only while hovered — no idle cost.
    ============================================================ */
 
-/* ---- 29a // KEYFRAMES ---- */
-
-/* text labels */
+/* ---- 24a // KEYFRAMES ---- */
 @keyframes nr-glitch-shift {
   0%, 100% {
     transform: translate(0, 0);
@@ -1617,7 +1553,6 @@ body.theme-dark.styled-scrollbars {
   }
 }
 
-/* row overlay */
 @keyframes nr-glitch-slice {
   0%   { clip-path: inset(0   0 92% 0); transform: translateX(-4px); opacity: 0.55; }
   15%  { clip-path: inset(28% 0 60% 0); transform: translateX( 3px); opacity: 0.40; }
@@ -1629,8 +1564,7 @@ body.theme-dark.styled-scrollbars {
   100% { clip-path: inset(35% 0 55% 0); transform: translateX( 1px); opacity: 0.40; }
 }
 
-
-/* ---- 29b // TOP NAV: non-active tabs ---- */
+/* ---- 24b // TOP NAV: non-active tabs ---- */
 .theme-dark .workspace-tab-header:not(.is-active):not(.mod-active) {
   position: relative;
   overflow: hidden;
@@ -1646,9 +1580,9 @@ body.theme-dark.styled-scrollbars {
   animation: nr-glitch-icon 780ms steps(1) infinite;
 }
 
-/* re-enables the pseudo that §05g disabled for the dividers —
-   dividers live on .workspace-tab-header-inner as a background-image,
-   so they're unaffected */
+/* re-enables the pseudo that §04g disables for the dividers —
+   the dividers themselves are a background-image on the inner
+   element, so they're unaffected */
 .theme-dark .workspace-tab-header:not(.is-active):not(.mod-active):hover::after {
   content: '' !important;
   position: absolute;
@@ -1659,8 +1593,7 @@ body.theme-dark.styled-scrollbars {
   animation: nr-glitch-slice 620ms steps(1) infinite;
 }
 
-
-/* ---- 29c // SIDE NAV: non-selected rows ---- */
+/* ---- 24c // SIDE NAV: non-selected rows ---- */
 .theme-dark .tree-item-self:not(.is-active):not(.is-selected):not(.has-focus) {
   position: relative;
   overflow: hidden;
@@ -1673,7 +1606,7 @@ body.theme-dark.styled-scrollbars {
 }
 
 .theme-dark .tree-item-self:not(.is-active):not(.is-selected):not(.has-focus):hover::after {
-  content: '' !important;
+  content: '';
   position: absolute;
   inset: 0;
   pointer-events: none;
@@ -1684,18 +1617,16 @@ body.theme-dark.styled-scrollbars {
 
 /* folders glitch yellow-hot to match their idle colour */
 .theme-dark .nav-folder-title:not(.is-active):hover::after {
-  background: rgba(252, 238, 10, 0.16) !important;
+  background: rgba(252, 238, 10, 0.16);
 }
 
-
-/* ---- 29d // ICON-ONLY CONTROLS ---- */
+/* ---- 24d // ICON-ONLY CONTROLS ---- */
 .theme-dark .side-dock-ribbon-action:not(.is-active):hover,
 .theme-dark .nav-action-button:not(.is-active):hover {
   animation: nr-glitch-icon 780ms steps(1) infinite;
 }
 
-
-/* ---- 29e // ACCESSIBILITY ---- */
+/* ---- 24e // ACCESSIBILITY ---- */
 @media (prefers-reduced-motion: reduce) {
   .theme-dark .workspace-tab-header:hover .workspace-tab-header-inner-title,
   .theme-dark .workspace-tab-header:hover .workspace-tab-header-inner-icon,
@@ -1707,26 +1638,29 @@ body.theme-dark.styled-scrollbars {
     animation: none !important;
   }
 }
+
+
 /* ============================================================
-   30 // CANVAS
-   Nodes chamfered like the buttons in §18.
-   Edges + arrows: subtle yellow glow (SVG, so filters are cheap).
+   25 // CANVAS
+   Nodes chamfered like the buttons in §17.
+   Edges + arrows: subtle yellow glow (SVG, so filters are cheap
+   here — unlike the graph's WebGL canvas).
    ============================================================ */
 .theme-dark {
   --nr-canvas-cut: 12px;                       /* corner chamfer */
   --canvas-dot-pattern: rgba(255, 46, 76, 0.10);
 }
 
-/* ---- 30a // SURFACE ---- */
+/* ---- 25a // SURFACE ---- */
 .theme-dark .canvas-wrapper,
 .theme-dark .canvas-background {
-  background-color: var(--nr-void) !important;
+  background-color: var(--nr-void);
 }
 
-/* ---- 30b // NODES: chamfered, same geometry as the buttons ---- */
+/* ---- 25b // NODES ---- */
 .theme-dark .canvas-node-container {
-  border-radius: 0 !important;
-  border: 1px solid var(--nr-red-deep) !important;
+  border-radius: 0;
+  border: 1px solid var(--nr-red-deep);
   background: var(--nr-black);
   box-shadow: 0 0 24px rgba(255, 46, 76, 0.10);
   clip-path: polygon(
@@ -1741,13 +1675,13 @@ body.theme-dark.styled-scrollbars {
 }
 
 .theme-dark .canvas-node:hover .canvas-node-container {
-  border-color: var(--nr-red) !important;
+  border-color: var(--nr-red);
   box-shadow: 0 0 26px rgba(255, 46, 76, 0.22);
 }
 
 .theme-dark .canvas-node.is-selected .canvas-node-container,
 .theme-dark .canvas-node.is-focused .canvas-node-container {
-  border-color: var(--nr-cyan) !important;
+  border-color: var(--nr-cyan);
   box-shadow: 0 0 28px rgba(0, 229, 255, 0.28);
 }
 
@@ -1756,14 +1690,13 @@ body.theme-dark.styled-scrollbars {
   font-weight: 600;
 }
 
-/* ---- 30c // EDGES + ARROWS ----
-   --canvas-color must be set at body level: the SVG <marker> that
-   draws the arrowheads lives outside .canvas-wrapper and won't
-   inherit from a scoped rule. The visible line doesn't read the
-   variable on its own, so point its stroke at it — that keeps the
-   line and tip in sync and preserves per-edge colours, which
-   Obsidian writes inline on the element.
-   ---- */
+/* ---- 25c // EDGES + ARROWS ----
+   FRAGILE: --canvas-color must be set at body level. The SVG
+   <marker> that draws the arrowheads lives outside
+   .canvas-wrapper and will not inherit from a scoped rule. The
+   visible line doesn't read the variable on its own, so its
+   stroke points at it — that keeps line and tip in sync while
+   preserving per-edge colours, which Obsidian writes inline. */
 body.theme-dark {
   --canvas-color: #fcee0a;
 }
@@ -1774,26 +1707,24 @@ body.theme-dark {
   --canvas-color: #b8102b;
 }
 
-/* the visible line */
 .theme-dark .canvas-display-path {
   stroke: var(--canvas-color) !important;
   fill: none !important;
 }
 
-/* subtle glow, one pass for every line and tip */
 .theme-dark .canvas-edges {
   filter: drop-shadow(0 0 2px rgba(252, 238, 10, 0.45));
 }
 
 .theme-dark .canvas-edge-label {
-  background: var(--nr-black) !important;
-  border: 1px solid rgba(252, 238, 10, 0.35) !important;
-  border-radius: 0 !important;
+  background: var(--nr-black);
+  border: 1px solid rgba(252, 238, 10, 0.35);
+  border-radius: 0;
   color: var(--nr-yellow);
   font-weight: 600;
 }
 
-/* ---- 30d // FLOATING MENU ---- */
+/* ---- 25d // FLOATING MENU ---- */
 .theme-dark .canvas-menu {
   background: rgba(10, 5, 9, 0.96);
   border: 1px solid var(--nr-red-deep);
@@ -1811,13 +1742,15 @@ body.theme-dark {
   background: transparent;
   filter: drop-shadow(0 0 7px rgba(0, 229, 255, 0.6));
 }
+
+
 /* ============================================================
-   31 // MOBILE
+   26 // MOBILE
    Release desktop-only locks, drop expensive effects, and carry
    the palette onto mobile's drawer/navbar DOM.
    ============================================================ */
 
-/* ---- 31a // RELEASE THE HEADER LOCK ---- */
+/* ---- 26a // RELEASE THE HEADER LOCK ---- */
 body.is-mobile .view-header,
 body.is-mobile .nav-header,
 body.is-mobile .workspace-tab-header-container {
@@ -1828,7 +1761,7 @@ body.is-mobile .workspace-tab-header-container {
   padding-bottom: revert !important;
 }
 
-/* ---- 31b // DROP EXPENSIVE EFFECTS ---- */
+/* ---- 26b // DROP EXPENSIVE EFFECTS ---- */
 body.is-mobile .workspace::before,
 body.is-mobile .app-container::after {
   display: none !important;
@@ -1858,22 +1791,15 @@ body.is-mobile .tree-item-self::after {
   animation: none !important;
 }
 
-/* ---- 31c // RESTORE TAPPABLE CONTROLS ---- */
+/* ---- 26c // RESTORE TAPPABLE CONTROLS ---- */
 body.is-mobile .workspace-tab-header-inner-close-button {
-  opacity: 1 !important;
+  opacity: 1;
 }
 
-/* ---- 31d // TYPE SCALE ---- */
-body.is-mobile {
-  --font-text-size: 17px;
-}
-
-/* if Rajdhani failed to load, 17px system sans is still readable */
-
-/* ---- 31e // DRAWER (mobile's sidebar) ---- */
+/* ---- 26d // DRAWER ---- */
 body.is-mobile .workspace-drawer,
 body.is-mobile .workspace-drawer-inner {
-  background: var(--nr-black) !important;
+  background: var(--nr-black);
 }
 
 body.is-mobile .workspace-drawer-header,
@@ -1892,20 +1818,20 @@ body.is-mobile .workspace-drawer-tab-option-item.is-active {
   background: rgba(34, 224, 245, 0.12);
 }
 
-/* ---- 31f // BOTTOM NAVBAR + TOOLBAR ---- */
+/* ---- 26e // BOTTOM NAVBAR + TOOLBAR ---- */
 body.is-mobile .mobile-navbar,
 body.is-mobile .mobile-toolbar {
-  background: linear-gradient(180deg, var(--nr-chrome-top) 0%, var(--nr-black) 100%) !important;
-  border-top: 1px solid rgba(255, 46, 76, 0.20) !important;
+  background: linear-gradient(180deg, var(--nr-chrome-top) 0%, var(--nr-black) 100%);
+  border-top: 1px solid rgba(255, 46, 76, 0.20);
 }
 
 body.is-mobile .mobile-navbar-action,
 body.is-mobile .mobile-toolbar-options-container .clickable-icon {
-  color: rgba(255, 46, 76, 0.65) !important;
+  color: rgba(255, 46, 76, 0.65);
   border-radius: 0;
 }
 
 body.is-mobile .mobile-navbar-action.is-active,
 body.is-mobile .mobile-toolbar-options-container .clickable-icon:active {
-  color: var(--nr-holo) !important;
+  color: var(--nr-holo);
 }
