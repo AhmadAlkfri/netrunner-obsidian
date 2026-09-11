@@ -1811,3 +1811,101 @@ body.theme-dark {
   background: transparent;
   filter: drop-shadow(0 0 7px rgba(0, 229, 255, 0.6));
 }
+/* ============================================================
+   31 // MOBILE
+   Release desktop-only locks, drop expensive effects, and carry
+   the palette onto mobile's drawer/navbar DOM.
+   ============================================================ */
+
+/* ---- 31a // RELEASE THE HEADER LOCK ---- */
+body.is-mobile .view-header,
+body.is-mobile .nav-header,
+body.is-mobile .workspace-tab-header-container {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  padding-top: revert !important;
+  padding-bottom: revert !important;
+}
+
+/* ---- 31b // DROP EXPENSIVE EFFECTS ---- */
+body.is-mobile .workspace::before,
+body.is-mobile .app-container::after {
+  display: none !important;
+}
+
+body.is-mobile .workspace-leaf-content[data-type="graph"] canvas,
+body.is-mobile .workspace-leaf-content[data-type="localgraph"] canvas,
+body.is-mobile .canvas-edges {
+  filter: none !important;
+}
+
+body.is-mobile .modal,
+body.is-mobile .prompt,
+body.is-mobile .graph-controls,
+body.is-mobile .canvas-menu {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* no hover on touch — kill the glitch layers outright */
+body.is-mobile .workspace-tab-header-inner-title,
+body.is-mobile .workspace-tab-header-inner-icon,
+body.is-mobile .tree-item-inner,
+body.is-mobile .nav-action-button,
+body.is-mobile .workspace-tab-header::after,
+body.is-mobile .tree-item-self::after {
+  animation: none !important;
+}
+
+/* ---- 31c // RESTORE TAPPABLE CONTROLS ---- */
+body.is-mobile .workspace-tab-header-inner-close-button {
+  opacity: 1 !important;
+}
+
+/* ---- 31d // TYPE SCALE ---- */
+body.is-mobile {
+  --font-text-size: 17px;
+}
+
+/* if Rajdhani failed to load, 17px system sans is still readable */
+
+/* ---- 31e // DRAWER (mobile's sidebar) ---- */
+body.is-mobile .workspace-drawer,
+body.is-mobile .workspace-drawer-inner {
+  background: var(--nr-black) !important;
+}
+
+body.is-mobile .workspace-drawer-header,
+body.is-mobile .workspace-drawer-header-title {
+  color: rgba(255, 46, 76, 0.85);
+  font-weight: 700;
+}
+
+body.is-mobile .workspace-drawer-tab-option-item {
+  border-radius: 0;
+  color: rgba(255, 46, 76, 0.70);
+}
+
+body.is-mobile .workspace-drawer-tab-option-item.is-active {
+  color: var(--nr-holo);
+  background: rgba(34, 224, 245, 0.12);
+}
+
+/* ---- 31f // BOTTOM NAVBAR + TOOLBAR ---- */
+body.is-mobile .mobile-navbar,
+body.is-mobile .mobile-toolbar {
+  background: linear-gradient(180deg, var(--nr-chrome-top) 0%, var(--nr-black) 100%) !important;
+  border-top: 1px solid rgba(255, 46, 76, 0.20) !important;
+}
+
+body.is-mobile .mobile-navbar-action,
+body.is-mobile .mobile-toolbar-options-container .clickable-icon {
+  color: rgba(255, 46, 76, 0.65) !important;
+  border-radius: 0;
+}
+
+body.is-mobile .mobile-navbar-action.is-active,
+body.is-mobile .mobile-toolbar-options-container .clickable-icon:active {
+  color: var(--nr-holo) !important;
+}
