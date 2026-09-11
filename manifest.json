@@ -1,7 +1,7 @@
 {
   "name": "Netrunner",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "minAppVersion": "1.5.0",
   "author": "Ahmad Alkfri",
-  "authorUrl": "https://github.com/AhmadAlkfri/netrunner-obsidian"
+  "authorUrl": "https://github.com/AhmadAlkfri"
 }
