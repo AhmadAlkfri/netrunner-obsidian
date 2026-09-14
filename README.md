@@ -29,5 +29,5 @@ JetBrains Mono 400/700.
 
 ### After installing
 
-Restart Obsidian completely — reloading the theme is not enough, the font cache
+Restart Obsidian completely - reloading the theme is not enough, the font cache
 is read at startup.

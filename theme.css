@@ -1,6 +1,6 @@
 /* ============================================================
    NETRUNNER  //  Cyberpunk 2077 inspired theme for Obsidian
-   BREACH PROTOCOL // v3.0.0-rc1
+   BREACH PROTOCOL // v3.2.0
    Dark mode only. No remote resources.
    Typeface: Rajdhani if installed locally, system sans otherwise.
    ------------------------------------------------------------
@@ -21,12 +21,20 @@
    FRAGILE — read the comment before editing:
      §15  hr is scoped to content; Obsidian's resize handles
           are <hr> and break the sidebar layout if styled
-     §12  checkboxes are scoped to markdown; settings toggles
-          use the same tag and misalign if caught
+     §13  toggles are scoped to .checkbox-container; §12 keeps
+          checkbox styling inside markdown so it can't catch them
      §05c nav row font-size/line-height are pinned; the file
           tree is virtualized and desyncs if they change
      §25c --canvas-color must be set at body level to reach
           the SVG <marker> that draws canvas arrowheads
+     §04  tab text and icons use EXPLICIT colours, never
+          `inherit` — inherit resolves through Obsidian's
+          tab/icon variable chain and lands on --text-normal
+          (near-white) in some focus states
+   ------------------------------------------------------------
+   !important is used in five places, each commented:
+     §19 scrollbar-color        §24e + §26b animation kills
+     §25c canvas stroke         §04b tab hover fill
    ============================================================ */
 
 
@@ -65,8 +73,8 @@
 
   /* typography — no webfont is loaded. Rajdhani is used if the
      user has it installed; otherwise the stack falls through to
-     narrow-ish system faces. 17px suits the fallback; if you
-     have Rajdhani installed, 19px matches its small x-height. */
+     narrow-ish system faces. 17px suits the fallback; with
+     Rajdhani installed, 19px is the intended size. */
   --nr-sans: 'Rajdhani', 'Saira Condensed', 'Archivo Narrow',
              -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --nr-mono: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace,
@@ -108,6 +116,17 @@
   --interactive-accent-hover: var(--nr-red-hot);
   --interactive-normal:       var(--nr-panel);
   --interactive-hover:        var(--nr-panel-2);
+
+  /* icon state variables. Unset, --icon-color-focused falls back
+     to --text-normal (near-white), which surfaces on tab icons
+     once focus moves away. */
+  --icon-color:         var(--nr-tab-idle);
+  --icon-color-hover:   var(--nr-tab-hover);
+  --icon-color-active:  var(--nr-tab-active);
+  --icon-color-focused: var(--nr-tab-active);
+  --icon-opacity:        0.9;
+  --icon-opacity-hover:  1;
+  --icon-opacity-active: 1;
 
   --link-color:            var(--nr-cyan);
   --link-color-hover:      #7df6ff;
@@ -171,6 +190,7 @@
     linear-gradient(rgba(255, 46, 76, 0.030) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 46, 76, 0.030) 1px, transparent 1px);
   background-size: 46px 46px;
+  -webkit-mask-image: radial-gradient(ellipse at 50% 0%, #000 10%, transparent 85%);
   mask-image: radial-gradient(ellipse at 50% 0%, #000 10%, transparent 85%);
 }
 
@@ -195,7 +215,8 @@
 /* ============================================================
    03 // LAYOUT + ALIGNMENT LOCK
    Every header row shares one box model so the rules under the
-   sidebar and the main pane land on the same pixel.
+   sidebar and the main pane land on the same pixel. The `body`
+   prefix supplies the specificity that used to need !important.
    ============================================================ */
 .theme-dark .workspace-split.mod-left-split,
 .theme-dark .workspace-split.mod-right-split,
@@ -210,45 +231,48 @@
 }
 
 /* ---- 03a // header rows: identical geometry ---- */
-.theme-dark .workspace-tab-header-container,
-.theme-dark .view-header,
-.theme-dark .nav-header {
-  box-sizing: border-box !important;
-  height: var(--header-height) !important;
-  min-height: var(--header-height) !important;
-  max-height: var(--header-height) !important;
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-  margin: 0 !important;
-  flex: 0 0 auto !important;
+body.theme-dark .workspace-tab-header-container,
+body.theme-dark .view-header,
+body.theme-dark .nav-header {
+  box-sizing: border-box;
+  height: var(--header-height);
+  min-height: var(--header-height);
+  max-height: var(--header-height);
+  padding-top: 0;
+  padding-bottom: 0;
+  margin: 0;
+  flex: 0 0 auto;
 }
 
-.theme-dark .view-header,
-.theme-dark .nav-buttons-container {
+body.theme-dark .view-header,
+body.theme-dark .nav-buttons-container {
   padding-inline: 10px;
 }
 
-.theme-dark .nav-buttons-container,
-.theme-dark .workspace-tab-header-container-inner {
-  height: 100% !important;
-  min-height: 0 !important;
-  margin: 0 !important;
+body.theme-dark .nav-buttons-container,
+body.theme-dark .workspace-tab-header-container-inner {
+  height: 100%;
+  min-height: 0;
+  margin: 0;
 }
 
 /* ---- 03b // no stray offsets above the first row ---- */
-.theme-dark .workspace-tab-container > .workspace-leaf,
-.theme-dark .workspace-split.mod-root .workspace-leaf-content,
-.theme-dark .workspace-split.mod-left-split .workspace-leaf-content,
-.theme-dark .workspace-split.mod-right-split .workspace-leaf-content {
-  padding-top: 0 !important;
-  margin-top: 0 !important;
-  border-top: none !important;
+body.theme-dark .workspace-tab-container > .workspace-leaf,
+body.theme-dark .workspace-split.mod-root .workspace-leaf-content,
+body.theme-dark .workspace-split.mod-left-split .workspace-leaf-content,
+body.theme-dark .workspace-split.mod-right-split .workspace-leaf-content {
+  padding-top: 0;
+  margin-top: 0;
+  border-top: none;
 }
 
 
 /* ============================================================
    04 // TOP CHROME  //  2077 menu bar
-   flat text tabs — red inactive, cyan active, no containers
+   Flat text tabs — red inactive, cyan active, no containers.
+   All colours are set EXPLICITLY. `color: inherit` on the title
+   or icon resolves through Obsidian's tab/icon variable chain
+   and turns near-white when the tab group loses focus.
    ============================================================ */
 .theme-dark {
   --nr-tab-idle:    rgba(255, 46, 76, 0.82);
@@ -256,30 +280,32 @@
   --nr-tab-active:  var(--nr-holo);
   --nr-tab-divider: rgba(255, 46, 76, 0.32);
 
-  /* Obsidian's tab state variables — these win over class rules,
-     without them the focused tab reverts to white */
+  /* Obsidian's tab state variables */
   --tab-text-color:                        var(--nr-tab-idle);
   --tab-text-color-active:                 var(--nr-tab-active);
   --tab-text-color-focused:                var(--nr-tab-idle);
   --tab-text-color-focused-active:         var(--nr-tab-active);
   --tab-text-color-focused-active-current: var(--nr-tab-active);
   --tab-text-color-focused-highlighted:    var(--nr-tab-hover);
+
+  /* suppress Obsidian's active-tab container chrome */
+  --tab-background-active:    transparent;
+  --tab-outline-color:        transparent;
+  --tab-outline-width:        0px;
+  --tab-divider-color:        transparent;
+  --tab-shadow-active:        none;
+  --tab-container-background: transparent;
 }
 
 /* ---- 04a // STRIP ---- */
-.theme-dark .workspace-tab-header-container {
+body.theme-dark .workspace-tab-header-container {
   position: relative;
   background: linear-gradient(180deg, var(--nr-chrome-top) 0%, var(--nr-black) 100%);
-  border-bottom: 1px solid rgba(255, 46, 76, 0.18) !important;
+  border-bottom: 1px solid rgba(255, 46, 76, 0.18);
   box-shadow: none;
 }
 
-.theme-dark .workspace-tab-header-container::before,
-.theme-dark .workspace-tab-header-container::after {
-  content: none !important;
-}
-
-.theme-dark .workspace-tab-header-container-inner {
+body.theme-dark .workspace-tab-header-container-inner {
   align-items: center;
 }
 
@@ -289,56 +315,109 @@
   border: none;
   box-shadow: none;
   clip-path: none;
+  -webkit-clip-path: none;
   border-radius: 0;
   transition: color 110ms linear, text-shadow 110ms linear;
 }
 
+/* !important REQUIRED: Obsidian fills .workspace-tab-header-inner
+   on hover and when active using --background-modifier-hover and
+   --tab-background-active. Neither the variables nor a (0,4,1)
+   selector suppress it on this build.
+   background-COLOR only — background-image carries §04g's
+   dividers and must survive. */
 .theme-dark .workspace-tab-header-inner {
-  background-color: transparent;
+  background-color: transparent !important;
   box-shadow: none;
   padding-inline: 14px;
 }
 
-.theme-dark .workspace-tab-header-inner-title {
+/* also scope the variable, so the fill has nothing to read */
+body.theme-dark .workspace-tab-header {
+  --background-modifier-hover: transparent;
+}
+
+/* ---- 04b2 // IDLE TITLE + ICON, explicit colours ---- */
+body.theme-dark .workspace-tab-header .workspace-tab-header-inner-title {
+  color: var(--nr-tab-idle);
   font-weight: 600;
-  color: inherit;
   text-shadow: 0 0 8px rgba(255, 46, 76, 0.22);
 }
 
-.theme-dark .workspace-tab-header-inner-icon,
-.theme-dark .workspace-tab-header-inner-icon svg,
-.theme-dark .workspace-tab-header-inner-icon .svg-icon {
-  color: inherit;
+body.theme-dark .workspace-tab-header .workspace-tab-header-inner-icon,
+body.theme-dark .workspace-tab-header .workspace-tab-header-inner-icon svg,
+body.theme-dark .workspace-tab-header .workspace-tab-header-inner-icon .svg-icon {
+  color: var(--nr-tab-idle);
   transition: color 110ms linear, filter 110ms linear;
 }
 
-.theme-dark .workspace-tab-header-inner-icon {
+body.theme-dark .workspace-tab-header .workspace-tab-header-inner-icon {
   filter: drop-shadow(0 0 6px rgba(255, 46, 76, 0.22));
 }
 
 /* ---- 04c // HOVER ---- */
-.theme-dark .workspace-tab-header:not(.is-active):hover .workspace-tab-header-inner-title {
+body.theme-dark .workspace-tab-header:not(.is-active):hover
+  .workspace-tab-header-inner-title {
+  color: var(--nr-tab-hover);
   text-shadow: 0 0 10px rgba(255, 46, 76, 0.55);
 }
 
-.theme-dark .workspace-tab-header:not(.is-active):hover .workspace-tab-header-inner-icon {
+body.theme-dark .workspace-tab-header:not(.is-active):hover
+  .workspace-tab-header-inner-icon,
+body.theme-dark .workspace-tab-header:not(.is-active):hover
+  .workspace-tab-header-inner-icon svg {
+  color: var(--nr-tab-hover);
+}
+
+body.theme-dark .workspace-tab-header:not(.is-active):hover
+  .workspace-tab-header-inner-icon {
   filter: drop-shadow(0 0 7px rgba(255, 46, 76, 0.5));
 }
 
-/* ---- 04d // ACTIVE ---- */
-.theme-dark .workspace-tab-header.is-active .workspace-tab-header-inner-title,
-.theme-dark .workspace-tab-header.mod-active .workspace-tab-header-inner-title {
-  color: inherit;
+/* ---- 04d // ACTIVE ----
+   The :not(.mod-active) branch is the unfocused-group state —
+   that's the one that used to render near-white. */
+body.theme-dark .workspace-tab-header.is-active .workspace-tab-header-inner-title,
+body.theme-dark .workspace-tab-header.mod-active .workspace-tab-header-inner-title,
+body.theme-dark .workspace-tabs.mod-active .workspace-tab-header.is-active
+  .workspace-tab-header-inner-title,
+body.theme-dark .workspace-tabs:not(.mod-active) .workspace-tab-header.is-active
+  .workspace-tab-header-inner-title {
+  color: var(--nr-tab-active);
   font-weight: 700;
   text-shadow:
     0 0 10px rgba(34, 224, 245, 0.55),
     0 0 22px rgba(34, 224, 245, 0.22);
 }
 
-.theme-dark .workspace-tab-header.is-active .workspace-tab-header-inner-icon,
-.theme-dark .workspace-tab-header.mod-active .workspace-tab-header-inner-icon {
-  color: inherit;
+body.theme-dark .workspace-tab-header.is-active .workspace-tab-header-inner-icon,
+body.theme-dark .workspace-tab-header.is-active .workspace-tab-header-inner-icon svg,
+body.theme-dark .workspace-tab-header.is-active .workspace-tab-header-inner-icon .svg-icon,
+body.theme-dark .workspace-tab-header.mod-active .workspace-tab-header-inner-icon,
+body.theme-dark .workspace-tab-header.mod-active .workspace-tab-header-inner-icon svg,
+body.theme-dark .workspace-tabs.mod-active .workspace-tab-header.is-active
+  .workspace-tab-header-inner-icon,
+body.theme-dark .workspace-tabs:not(.mod-active) .workspace-tab-header.is-active
+  .workspace-tab-header-inner-icon,
+body.theme-dark .workspace-tabs:not(.mod-active) .workspace-tab-header.is-active
+  .workspace-tab-header-inner-icon svg {
+  color: var(--nr-tab-active);
+}
+
+body.theme-dark .workspace-tab-header.is-active .workspace-tab-header-inner-icon,
+body.theme-dark .workspace-tab-header.mod-active .workspace-tab-header-inner-icon {
   filter: drop-shadow(0 0 7px rgba(34, 224, 245, 0.7));
+}
+
+/* container reset for the active tab */
+body.theme-dark .workspace-tabs .workspace-tab-header.is-active,
+body.theme-dark .workspace-tabs .workspace-tab-header.mod-active,
+body.theme-dark .workspace-tabs.mod-active .workspace-tab-header.is-active,
+body.theme-dark .workspace-tabs.mod-active .workspace-tab-header.is-active.mod-active {
+  background: none;
+  box-shadow: none;
+  border-color: transparent;
+  outline: none;
 }
 
 /* ---- 04e // CLOSE BUTTON ---- */
@@ -351,6 +430,12 @@
   .workspace-tab-header-inner-close-button {
   opacity: 1;
   color: var(--nr-red);
+}
+
+/* the close button reads --background-modifier-hover too, which
+   is scoped to transparent above — restore a fill explicitly */
+body.theme-dark .workspace-tab-header-inner-close-button:hover {
+  background-color: rgba(255, 46, 76, 0.18);
 }
 
 /* ---- 04f // STRIP CONTROLS ---- */
@@ -371,16 +456,18 @@
 
 /* ---- 04g // DIVIDERS: always on, state-independent ----
    Obsidian hides its own separators either side of the active
-   tab; these are drawn as a background-image on the inner
-   element so they never depend on state. ---- */
-.theme-dark .workspace-tab-header::before,
-.theme-dark .workspace-tab-header::after,
-.theme-dark .workspace-tab-header-inner::before,
-.theme-dark .workspace-tab-header-inner::after {
-  content: none !important;
+   tab. These are drawn as a background-image on the inner
+   element instead, so they never depend on state. ---- */
+body.theme-dark .workspace-tab-header-container::before,
+body.theme-dark .workspace-tab-header-container::after,
+body.theme-dark .workspace-tab-header::before,
+body.theme-dark .workspace-tab-header::after,
+body.theme-dark .workspace-tab-header-inner::before,
+body.theme-dark .workspace-tab-header-inner::after {
+  content: none;
 }
 
-.theme-dark .workspace-split.mod-root
+body.theme-dark .workspace-split.mod-root
   .workspace-tab-header + .workspace-tab-header
   .workspace-tab-header-inner {
   background-image: linear-gradient(
@@ -396,9 +483,9 @@
 }
 
 /* ---- 04h // VIEW HEADER + BREADCRUMBS ---- */
-.theme-dark .view-header {
+body.theme-dark .view-header {
   background: linear-gradient(180deg, #100709 0%, var(--nr-black) 100%);
-  border-bottom: 1px solid rgba(34, 224, 245, 0.40) !important;
+  border-bottom: 1px solid rgba(34, 224, 245, 0.40);
   box-shadow: 0 1px 10px rgba(34, 224, 245, 0.10);
 }
 
@@ -458,9 +545,9 @@
 }
 
 /* ---- 05a // PANEL ---- */
-.theme-dark .nav-header {
+body.theme-dark .nav-header {
   background: linear-gradient(180deg, var(--nr-chrome-top) 0%, var(--nr-black) 100%);
-  border-bottom: 1px solid rgba(34, 224, 245, 0.40) !important;
+  border-bottom: 1px solid rgba(34, 224, 245, 0.40);
   box-shadow: 0 1px 10px rgba(34, 224, 245, 0.10);
 }
 
@@ -495,15 +582,15 @@
    own variables. The file tree is virtualized — it measures row
    height once and computes scroll offsets from it. Changing
    either value leaves a large empty block above the tree. ---- */
-.theme-dark .nav-file-title,
-.theme-dark .nav-folder-title,
-.theme-dark .tree-item-self {
+body.theme-dark .nav-file-title,
+body.theme-dark .nav-folder-title,
+body.theme-dark .tree-item-self {
   border-radius: 0;
   border: none;
   background: transparent;
   box-shadow: inset 2px 0 0 transparent;
-  font-size: var(--nav-item-size) !important;
-  line-height: var(--line-height-tight) !important;
+  font-size: var(--nav-item-size);
+  line-height: var(--line-height-tight);
   letter-spacing: 0;
   text-transform: none;
   transition: color 110ms linear, box-shadow 110ms linear, text-shadow 110ms linear;
@@ -513,7 +600,7 @@
   font-weight: 500;
 }
 
-.theme-dark .nav-folder-title {
+body.theme-dark .nav-folder-title {
   color: var(--nr-nav-folder);
   font-weight: 700;
   text-shadow: 0 0 9px rgba(252, 238, 10, 0.18);
@@ -528,25 +615,27 @@
 }
 
 /* ---- 05d // HOVER ---- */
-.theme-dark .nav-file-title:hover,
-.theme-dark .tree-item-self:hover {
+body.theme-dark .nav-file-title:hover,
+body.theme-dark .tree-item-self:hover {
   background: transparent;
   box-shadow: inset 2px 0 0 rgba(255, 46, 76, 0.65);
   text-shadow: 0 0 9px rgba(255, 46, 76, 0.45);
 }
 
-.theme-dark .nav-folder-title:hover {
+body.theme-dark .nav-folder-title:hover {
   background: transparent;
   color: var(--nr-nav-folder-hover);
   box-shadow: inset 2px 0 0 rgba(252, 238, 10, 0.70);
   text-shadow: 0 0 10px rgba(252, 238, 10, 0.50);
 }
 
-/* ---- 05e // ACTIVE: cyan text + full-row cyan wash ---- */
-.theme-dark .nav-file-title.is-active,
-.theme-dark .tree-item-self.is-active,
-.theme-dark .tree-item-self.has-focus,
-.theme-dark .tree-item-self.is-selected {
+/* ---- 05e // ACTIVE: cyan text + full-row cyan wash ----
+   Single inset bar only. An unspread outer glow here reads as a
+   soft box around the row rather than a halo. */
+body.theme-dark .nav-file-title.is-active,
+body.theme-dark .tree-item-self.is-active,
+body.theme-dark .tree-item-self.has-focus,
+body.theme-dark .tree-item-self.is-selected {
   background: linear-gradient(
     90deg,
     rgba(34, 224, 245, 0.22) 0%,
@@ -555,16 +644,11 @@
   );
   color: var(--nr-nav-active);
   font-weight: 700;
-  box-shadow:
-    inset 2px 0 0 var(--nr-nav-active),
-    0 0 18px rgba(34, 224, 245, 0.10);
-  text-shadow:
-    0 0 10px rgba(34, 224, 245, 0.55),
-    0 0 22px rgba(34, 224, 245, 0.20);
+  box-shadow: inset 2px 0 0 var(--nr-nav-active);
 }
 
-.theme-dark .nav-file-title.is-active .tree-item-inner,
-.theme-dark .tree-item-self.is-active .tree-item-inner {
+body.theme-dark .nav-file-title.is-active .tree-item-inner,
+body.theme-dark .tree-item-self.is-active .tree-item-inner {
   color: inherit;
 }
 
@@ -620,15 +704,15 @@
 }
 
 /* ---- 05h // SIDEBAR SEARCH FIELD ---- */
-.theme-dark .workspace-split.mod-left-split .search-input-container input,
-.theme-dark .workspace-split.mod-right-split .search-input-container input {
+body.theme-dark .workspace-split.mod-left-split .search-input-container input,
+body.theme-dark .workspace-split.mod-right-split .search-input-container input {
   background: #0d060a;
   border: 1px solid rgba(255, 46, 76, 0.25);
   border-radius: 0;
   color: var(--nr-text);
 }
 
-.theme-dark .workspace-split.mod-left-split .search-input-container input:focus {
+body.theme-dark .workspace-split.mod-left-split .search-input-container input:focus {
   border-color: var(--nr-nav-active);
   box-shadow: 0 0 12px rgba(34, 224, 245, 0.20);
 }
@@ -781,6 +865,7 @@
   text-transform: none;
   letter-spacing: 0;
   padding: 1px 8px;
+  -webkit-clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
   clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
 }
 
@@ -848,14 +933,15 @@
 
 /* ============================================================
    10 // MATH
+   Obsidian wraps MathJax output in .math, so there's no need to
+   target the mjx-container custom element.
    ============================================================ */
 .theme-dark .math,
-.theme-dark mjx-container {
+.theme-dark .MathJax {
   color: var(--nr-cyan);
 }
 
-.theme-dark .math-block,
-.theme-dark mjx-container[display="true"] {
+.theme-dark .math-block {
   border-left: 2px solid var(--nr-cyan-dim);
   padding-left: 14px;
   background: rgba(0, 229, 255, 0.03);
@@ -946,16 +1032,17 @@
 .theme-dark .task-list-item.is-checked .task-list-item-checkbox + *,
 .theme-dark li[data-task="x"] {
   color: var(--nr-text-faint);
-  text-decoration-color: var(--nr-red-deep);
+  text-decoration: line-through rgba(184, 16, 43, 0.8);
 }
 
 
 /* ============================================================
    13 // TOGGLES  //  HUD switch
    Three layers: the container is the outline, the input is
-   repurposed as the interior fill (1px inset so the chamfered
+   repurposed as the interior fill (inset 1px so the chamfered
    diagonal gets stroked like every other edge), and ::after is
-   the sliding thumb.
+   the sliding thumb. The `body` prefix supplies the specificity
+   these used to get from !important.
    ============================================================ */
 .theme-dark {
   --nr-tgl-w:     52px;
@@ -965,21 +1052,26 @@
   --nr-tgl-thumb: 24px;
 }
 
-.theme-dark .checkbox-container {
-  position: relative !important;
-  width: var(--nr-tgl-w) !important;
-  min-width: var(--nr-tgl-w) !important;
-  height: var(--nr-tgl-h) !important;
+body.theme-dark .checkbox-container {
+  position: relative;
+  width: var(--nr-tgl-w);
+  min-width: var(--nr-tgl-w);
+  height: var(--nr-tgl-h);
   flex: 0 0 auto;
   align-self: center;
   vertical-align: middle;
-  border: none !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  background: var(--nr-red-deep) !important;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  background: var(--nr-red-deep);
+  -webkit-clip-path: polygon(
+    0 0, 100% 0,
+    100% calc(100% - var(--nr-tgl-cut)),
+    calc(100% - var(--nr-tgl-cut)) 100%,
+    0 100%
+  );
   clip-path: polygon(
-    0 0,
-    100% 0,
+    0 0, 100% 0,
     100% calc(100% - var(--nr-tgl-cut)),
     calc(100% - var(--nr-tgl-cut)) 100%,
     0 100%
@@ -988,57 +1080,67 @@
   transition: background 130ms linear;
 }
 
-.theme-dark .checkbox-container:hover      { background: var(--nr-red) !important; }
-.theme-dark .checkbox-container.is-enabled { background: var(--nr-cyan) !important; }
+body.theme-dark .checkbox-container:hover      { background: var(--nr-red); }
+body.theme-dark .checkbox-container.is-enabled { background: var(--nr-cyan); }
 
-.theme-dark .checkbox-container input[type="checkbox"] {
-  appearance: none !important;
-  -webkit-appearance: none !important;
-  position: absolute !important;
-  inset: 1px !important;
-  width: auto !important;
-  height: auto !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  border: none !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  opacity: 1 !important;
-  pointer-events: none !important;
+body.theme-dark .checkbox-container input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  position: absolute;
+  inset: 1px;
+  width: auto;
+  height: auto;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  opacity: 1;
+  pointer-events: none;
   z-index: 1;
-  background: #0a0509 !important;
+  background: #0a0509;
+  -webkit-clip-path: polygon(
+    0 0, 100% 0,
+    100% calc(100% - var(--nr-tgl-cut) + 1px),
+    calc(100% - var(--nr-tgl-cut) + 1px) 100%,
+    0 100%
+  );
   clip-path: polygon(
-    0 0,
-    100% 0,
+    0 0, 100% 0,
     100% calc(100% - var(--nr-tgl-cut) + 1px),
     calc(100% - var(--nr-tgl-cut) + 1px) 100%,
     0 100%
   );
 }
 
-.theme-dark .checkbox-container.is-enabled input[type="checkbox"] {
-  background: #061014 !important;
+body.theme-dark .checkbox-container.is-enabled input[type="checkbox"] {
+  background: #061014;
 }
 
-.theme-dark .checkbox-container::after {
-  content: '' !important;
-  position: absolute !important;
+body.theme-dark .checkbox-container::after {
+  content: '';
+  position: absolute;
   z-index: 2;
-  top: 50% !important;
-  bottom: auto !important;
-  left: var(--nr-tgl-pad) !important;
-  right: auto !important;
-  width: var(--nr-tgl-thumb) !important;
-  height: calc(var(--nr-tgl-h) - (var(--nr-tgl-pad) * 2)) !important;
-  margin: 0 !important;
-  box-sizing: border-box !important;
-  border-radius: 0 !important;
-  transform: translateY(-50%) !important;
-  background: var(--nr-red) !important;
+  top: 50%;
+  bottom: auto;
+  left: var(--nr-tgl-pad);
+  right: auto;
+  width: var(--nr-tgl-thumb);
+  height: calc(var(--nr-tgl-h) - (var(--nr-tgl-pad) * 2));
+  margin: 0;
+  box-sizing: border-box;
+  border-radius: 0;
+  transform: translateY(-50%);
+  background: var(--nr-red);
   box-shadow: 0 0 10px rgba(255, 46, 76, 0.40);
+  -webkit-clip-path: polygon(
+    0 0, 100% 0,
+    100% calc(100% - var(--nr-tgl-cut) + var(--nr-tgl-pad)),
+    calc(100% - var(--nr-tgl-cut) + var(--nr-tgl-pad)) 100%,
+    0 100%
+  );
   clip-path: polygon(
-    0 0,
-    100% 0,
+    0 0, 100% 0,
     100% calc(100% - var(--nr-tgl-cut) + var(--nr-tgl-pad)),
     calc(100% - var(--nr-tgl-cut) + var(--nr-tgl-pad)) 100%,
     0 100%
@@ -1048,14 +1150,14 @@
               box-shadow 130ms linear;
 }
 
-.theme-dark .checkbox-container.is-enabled::after {
-  left: calc(100% - var(--nr-tgl-thumb) - var(--nr-tgl-pad)) !important;
-  transform: translateY(-50%) !important;
-  background: var(--nr-cyan) !important;
+body.theme-dark .checkbox-container.is-enabled::after {
+  left: calc(100% - var(--nr-tgl-thumb) - var(--nr-tgl-pad));
+  transform: translateY(-50%);
+  background: var(--nr-cyan);
   box-shadow: 0 0 10px rgba(0, 229, 255, 0.45);
 }
 
-.theme-dark .checkbox-container:focus-visible {
+body.theme-dark .checkbox-container:focus-visible {
   outline: 1px solid var(--nr-cyan);
   outline-offset: 2px;
 }
@@ -1118,19 +1220,19 @@
   box-shadow: 0 0 10px var(--nr-red);
 }
 
-.theme-dark hr.workspace-leaf-resize-handle {
-  position: absolute !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  height: auto !important;
-  background: none !important;
-  border: none !important;
-  overflow: hidden !important;
+body.theme-dark hr.workspace-leaf-resize-handle {
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  height: auto;
+  background: none;
+  border: none;
+  overflow: hidden;
 }
 
-.theme-dark hr.workspace-leaf-resize-handle::before,
-.theme-dark hr.workspace-leaf-resize-handle::after {
-  content: none !important;
+body.theme-dark hr.workspace-leaf-resize-handle::before,
+body.theme-dark hr.workspace-leaf-resize-handle::after {
+  content: none;
 }
 
 
@@ -1144,6 +1246,7 @@
   border-radius: 0;
   box-shadow: 0 0 60px rgba(255, 46, 76, 0.18), 0 20px 60px rgba(0,0,0,0.8);
   backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 
 .theme-dark .prompt-input {
@@ -1182,6 +1285,7 @@
   color: var(--nr-red-hot);
   text-transform: uppercase;
   letter-spacing: 0;
+  -webkit-clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
   clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
   transition: all 100ms linear;
 }
@@ -1252,10 +1356,12 @@
 
 /* ============================================================
    19 // SCROLLBARS
-   Obsidian sets `scrollbar-color` on body. In Chromium 121+ any
-   non-auto value disables ::-webkit-scrollbar styling entirely,
-   so it has to be reset first.
    ============================================================ */
+
+/* !important REQUIRED: Obsidian declares `scrollbar-color` on
+   body, and in Chromium 121+ any non-auto value disables every
+   ::-webkit-scrollbar rule below. Resetting it to auto is the
+   only way to re-enable them. */
 body.theme-dark:not(.styled-scrollbars),
 body.theme-dark.styled-scrollbars {
   scrollbar-color: auto !important;
@@ -1299,19 +1405,19 @@ body.theme-dark.styled-scrollbars {
 /* ---- 20a // DRAWN CURSOR (CodeMirror) ----
    A real DOM element, so it can glow and blink. Rendered whenever
    the editor has focus, not only while a selection exists. */
-.theme-dark .cm-editor .cm-cursor,
-.theme-dark .cm-editor .cm-cursor-primary,
-.theme-dark .cm-editor.cm-focused .cm-cursor,
-.theme-dark .cm-editor.cm-focused .cm-cursor-primary {
-  display: block !important;
-  border-left: 2px solid var(--nr-red) !important;
+body.theme-dark .cm-editor .cm-cursor,
+body.theme-dark .cm-editor .cm-cursor-primary,
+body.theme-dark .cm-editor.cm-focused .cm-cursor,
+body.theme-dark .cm-editor.cm-focused .cm-cursor-primary {
+  display: block;
+  border-left: 2px solid var(--nr-red);
   box-shadow:
     0 0 10px var(--nr-red),
     0 0 22px rgba(255, 46, 76, 0.45);
   animation: nr-blink 1.1s steps(1) infinite;
 }
 
-.theme-dark .cm-editor:not(.cm-focused) .cm-cursorLayer {
+body.theme-dark .cm-editor:not(.cm-focused) .cm-cursorLayer {
   display: none;
 }
 
@@ -1340,12 +1446,12 @@ body.theme-dark.styled-scrollbars {
   text-shadow: 0 0 8px rgba(255, 46, 76, 0.7);
 }
 
-.theme-dark .cm-editor .cm-selectionBackground {
-  background: rgba(255, 46, 76, 0.26) !important;
+body.theme-dark .cm-editor .cm-selectionBackground {
+  background: rgba(255, 46, 76, 0.26);
 }
 
-.theme-dark .cm-editor.cm-focused .cm-selectionBackground {
-  background: rgba(255, 46, 76, 0.32) !important;
+body.theme-dark .cm-editor.cm-focused .cm-selectionBackground {
+  background: rgba(255, 46, 76, 0.32);
 }
 
 /* ---- 20d // ACTIVE LINE ----
@@ -1421,6 +1527,7 @@ body.theme-dark.styled-scrollbars {
   border-radius: 0;
   box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 
 .theme-dark .graph-controls .clickable-icon:hover {
@@ -1580,11 +1687,13 @@ body.theme-dark.styled-scrollbars {
   animation: nr-glitch-icon 780ms steps(1) infinite;
 }
 
-/* re-enables the pseudo that §04g disables for the dividers —
-   the dividers themselves are a background-image on the inner
-   element, so they're unaffected */
-.theme-dark .workspace-tab-header:not(.is-active):not(.mod-active):hover::after {
-  content: '' !important;
+/* Restricted to the main tab strip. The sidebar's icon-only tabs
+   are ~24px wide, so the slice has no room to travel and renders
+   as a solid box. Those keep the icon flicker from §24d instead.
+   To put it back on the sidebar, drop `.workspace-split.mod-root`. */
+body.theme-dark .workspace-split.mod-root
+  .workspace-tab-header:not(.is-active):not(.mod-active):hover::after {
+  content: '';
   position: absolute;
   inset: 0;
   pointer-events: none;
@@ -1622,11 +1731,17 @@ body.theme-dark.styled-scrollbars {
 
 /* ---- 24d // ICON-ONLY CONTROLS ---- */
 .theme-dark .side-dock-ribbon-action:not(.is-active):hover,
-.theme-dark .nav-action-button:not(.is-active):hover {
+.theme-dark .nav-action-button:not(.is-active):hover,
+.theme-dark .mod-left-split .workspace-tab-header:not(.is-active):hover
+  .workspace-tab-header-inner-icon,
+.theme-dark .mod-right-split .workspace-tab-header:not(.is-active):hover
+  .workspace-tab-header-inner-icon {
   animation: nr-glitch-icon 780ms steps(1) infinite;
 }
 
-/* ---- 24e // ACCESSIBILITY ---- */
+/* ---- 24e // ACCESSIBILITY ----
+   !important REQUIRED: the rules above carry :not() chains at
+   (0,5,1); a flat selector here cannot outrank them. */
 @media (prefers-reduced-motion: reduce) {
   .theme-dark .workspace-tab-header:hover .workspace-tab-header-inner-title,
   .theme-dark .workspace-tab-header:hover .workspace-tab-header-inner-icon,
@@ -1663,6 +1778,14 @@ body.theme-dark.styled-scrollbars {
   border: 1px solid var(--nr-red-deep);
   background: var(--nr-black);
   box-shadow: 0 0 24px rgba(255, 46, 76, 0.10);
+  -webkit-clip-path: polygon(
+    var(--nr-canvas-cut) 0,
+    100% 0,
+    100% calc(100% - var(--nr-canvas-cut)),
+    calc(100% - var(--nr-canvas-cut)) 100%,
+    0 100%,
+    0 var(--nr-canvas-cut)
+  );
   clip-path: polygon(
     var(--nr-canvas-cut) 0,
     100% 0,
@@ -1693,9 +1816,11 @@ body.theme-dark.styled-scrollbars {
 /* ---- 25c // EDGES + ARROWS ----
    FRAGILE: --canvas-color must be set at body level. The SVG
    <marker> that draws the arrowheads lives outside
-   .canvas-wrapper and will not inherit from a scoped rule. The
-   visible line doesn't read the variable on its own, so its
-   stroke points at it — that keeps line and tip in sync while
+   .canvas-wrapper and will not inherit from a scoped rule.
+
+   !important REQUIRED on the stroke: Obsidian's own rule wins on
+   load order otherwise, and the lines render invisible. Pointing
+   the stroke at the variable keeps line and tip in sync while
    preserving per-edge colours, which Obsidian writes inline. */
 body.theme-dark {
   --canvas-color: #fcee0a;
@@ -1751,37 +1876,39 @@ body.theme-dark {
    ============================================================ */
 
 /* ---- 26a // RELEASE THE HEADER LOCK ---- */
-body.is-mobile .view-header,
-body.is-mobile .nav-header,
-body.is-mobile .workspace-tab-header-container {
-  height: auto !important;
-  min-height: 0 !important;
-  max-height: none !important;
-  padding-top: revert !important;
-  padding-bottom: revert !important;
+body.is-mobile.theme-dark .view-header,
+body.is-mobile.theme-dark .nav-header,
+body.is-mobile.theme-dark .workspace-tab-header-container {
+  height: auto;
+  min-height: 0;
+  max-height: none;
+  padding-top: revert;
+  padding-bottom: revert;
 }
 
 /* ---- 26b // DROP EXPENSIVE EFFECTS ---- */
-body.is-mobile .workspace::before,
-body.is-mobile .app-container::after {
-  display: none !important;
+body.is-mobile.theme-dark .workspace::before,
+body.is-mobile.theme-dark .app-container::after {
+  display: none;
 }
 
-body.is-mobile .workspace-leaf-content[data-type="graph"] canvas,
-body.is-mobile .workspace-leaf-content[data-type="localgraph"] canvas,
-body.is-mobile .canvas-edges {
-  filter: none !important;
+body.is-mobile.theme-dark .workspace-leaf-content[data-type="graph"] canvas,
+body.is-mobile.theme-dark .workspace-leaf-content[data-type="localgraph"] canvas,
+body.is-mobile.theme-dark .canvas-edges {
+  filter: none;
 }
 
-body.is-mobile .modal,
-body.is-mobile .prompt,
-body.is-mobile .graph-controls,
-body.is-mobile .canvas-menu {
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
+body.is-mobile.theme-dark .modal,
+body.is-mobile.theme-dark .prompt,
+body.is-mobile.theme-dark .graph-controls,
+body.is-mobile.theme-dark .canvas-menu {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
-/* no hover on touch — kill the glitch layers outright */
+/* !important REQUIRED: §24's hover rules carry :not() chains at
+   (0,5,1) and cannot be outranked by a flat selector. There is
+   no hover on touch, so these animations only ever misfire. */
 body.is-mobile .workspace-tab-header-inner-title,
 body.is-mobile .workspace-tab-header-inner-icon,
 body.is-mobile .tree-item-inner,
@@ -1792,46 +1919,46 @@ body.is-mobile .tree-item-self::after {
 }
 
 /* ---- 26c // RESTORE TAPPABLE CONTROLS ---- */
-body.is-mobile .workspace-tab-header-inner-close-button {
+body.is-mobile.theme-dark .workspace-tab-header-inner-close-button {
   opacity: 1;
 }
 
 /* ---- 26d // DRAWER ---- */
-body.is-mobile .workspace-drawer,
-body.is-mobile .workspace-drawer-inner {
+body.is-mobile.theme-dark .workspace-drawer,
+body.is-mobile.theme-dark .workspace-drawer-inner {
   background: var(--nr-black);
 }
 
-body.is-mobile .workspace-drawer-header,
-body.is-mobile .workspace-drawer-header-title {
+body.is-mobile.theme-dark .workspace-drawer-header,
+body.is-mobile.theme-dark .workspace-drawer-header-title {
   color: rgba(255, 46, 76, 0.85);
   font-weight: 700;
 }
 
-body.is-mobile .workspace-drawer-tab-option-item {
+body.is-mobile.theme-dark .workspace-drawer-tab-option-item {
   border-radius: 0;
   color: rgba(255, 46, 76, 0.70);
 }
 
-body.is-mobile .workspace-drawer-tab-option-item.is-active {
+body.is-mobile.theme-dark .workspace-drawer-tab-option-item.is-active {
   color: var(--nr-holo);
   background: rgba(34, 224, 245, 0.12);
 }
 
 /* ---- 26e // BOTTOM NAVBAR + TOOLBAR ---- */
-body.is-mobile .mobile-navbar,
-body.is-mobile .mobile-toolbar {
+body.is-mobile.theme-dark .mobile-navbar,
+body.is-mobile.theme-dark .mobile-toolbar {
   background: linear-gradient(180deg, var(--nr-chrome-top) 0%, var(--nr-black) 100%);
   border-top: 1px solid rgba(255, 46, 76, 0.20);
 }
 
-body.is-mobile .mobile-navbar-action,
-body.is-mobile .mobile-toolbar-options-container .clickable-icon {
+body.is-mobile.theme-dark .mobile-navbar-action,
+body.is-mobile.theme-dark .mobile-toolbar-options-container .clickable-icon {
   color: rgba(255, 46, 76, 0.65);
   border-radius: 0;
 }
 
-body.is-mobile .mobile-navbar-action.is-active,
-body.is-mobile .mobile-toolbar-options-container .clickable-icon:active {
+body.is-mobile.theme-dark .mobile-navbar-action.is-active,
+body.is-mobile.theme-dark .mobile-toolbar-options-container .clickable-icon:active {
   color: var(--nr-holo);
 }
