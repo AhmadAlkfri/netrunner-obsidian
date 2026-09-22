@@ -1,24 +1,32 @@
 /* ============================================================
    NETRUNNER  //  Cyberpunk 2077 inspired theme for Obsidian
-   BREACH PROTOCOL // v3.2.0
+   BREACH PROTOCOL // v3.2.1
    Dark mode only. No remote resources.
    Typeface: Rajdhani if installed locally, system sans otherwise.
    ------------------------------------------------------------
-   01 palette + type tokens      14 tables
-   02 ambient grid + scanlines   15 hr + resize handle guard
-   03 layout + alignment lock    16 modals / prompt
-   04 top chrome                 17 buttons + inputs
-   05 sidenav                    18 status bar
-   06 headings                   19 scrollbars
-   07 body copy                  20 cursor + selection
-   08 links / tags / marks       21 graph view
-   09 code                       22 embeds + images
-   10 math                       23 h1 glitch
-   11 quotes + callouts          24 glitch on hover
-   12 lists + task checkboxes    25 canvas
-   13 toggles                    26 mobile
+   01 palette + type tokens      15 hr + resize handle guard
+   02 ambient grid + scanlines   16 modals / prompt
+   03 layout lock (desktop)      17 buttons + inputs
+   04 top chrome                 18 status bar
+   05 sidenav                    19 scrollbars
+   06 headings                   20 cursor + selection
+   07 body copy                  21 graph view
+   08 links / tags / marks       22 embeds + images
+   09 code                       23 h1 glitch
+   10 math                       24 glitch on hover
+   11 quotes + callouts          25 canvas
+   12 lists + task checkboxes    26 mobile
+   13 toggles                    27 window controls
+   14 tables
    ------------------------------------------------------------
    FRAGILE — read the comment before editing:
+     §03  every selector carries :not(.is-mobile). That element
+          set includes .workspace-tab-header-container, which on
+          iOS is the drawer's Files/Search/Bookmarks icon row —
+          Obsidian owns its geometry there. An author `revert`
+          CANNOT hand a property back to Obsidian (it reverts to
+          the user-agent origin), so scope it out, never release
+          it further down the file
      §15  hr is scoped to content; Obsidian's resize handles
           are <hr> and break the sidebar layout if styled
      §13  toggles are scoped to .checkbox-container; §12 keeps
@@ -31,10 +39,15 @@
           `inherit` — inherit resolves through Obsidian's
           tab/icon variable chain and lands on --text-normal
           (near-white) in some focus states
+     §04a the tab strip must NOT be position:relative. §04g
+          blanks its pseudo-elements so nothing needs it, and a
+          positioned strip paints over the Windows caption
+          buttons and the iOS drawer's file list
    ------------------------------------------------------------
-   !important is used in five places, each commented:
-     §19 scrollbar-color        §24e + §26b animation kills
-     §25c canvas stroke         §04b tab hover fill
+   !important is used in six places, each commented:
+     §04b tab hover fill        §24e animation kill
+     §19 scrollbar-color        §26b animation kill
+     §25c canvas stroke         §26b pseudo-element kill
    ============================================================ */
 
 
@@ -213,27 +226,39 @@
 
 
 /* ============================================================
-   03 // LAYOUT + ALIGNMENT LOCK
+   03 // LAYOUT + ALIGNMENT LOCK  //  DESKTOP ONLY
    Every header row shares one box model so the rules under the
-   sidebar and the main pane land on the same pixel. The `body`
-   prefix supplies the specificity that used to need !important.
+   sidebar and the main pane land on the same pixel.
+
+   FRAGILE: every selector here carries :not(.is-mobile), and it
+   must stay that way. `.workspace-tab-header-container` is the
+   desktop tab strip AND the iOS drawer's Files/Search/Bookmarks
+   icon row — Obsidian owns that element's geometry on mobile,
+   and a fixed height on it leaves the row floating over the file
+   list, swallowing every tap underneath.
+
+   Do NOT try to release this with a `revert` block further down
+   the file. In an author stylesheet `revert` rolls back to the
+   USER-AGENT origin (0 for a div), not to Obsidian's own author
+   value, so it re-asserts the damage instead of healing it.
+   Scoping out is the only correct mechanism.
    ============================================================ */
-.theme-dark .workspace-split.mod-left-split,
-.theme-dark .workspace-split.mod-right-split,
-.theme-dark .workspace-tabs,
-.theme-dark .workspace-tab-container,
-.theme-dark .workspace-leaf,
-.theme-dark .workspace-leaf-content,
-.theme-dark .view-content,
-.theme-dark .nav-files-container {
+body.theme-dark:not(.is-mobile) .workspace-split.mod-left-split,
+body.theme-dark:not(.is-mobile) .workspace-split.mod-right-split,
+body.theme-dark:not(.is-mobile) .workspace-tabs,
+body.theme-dark:not(.is-mobile) .workspace-tab-container,
+body.theme-dark:not(.is-mobile) .workspace-leaf,
+body.theme-dark:not(.is-mobile) .workspace-leaf-content,
+body.theme-dark:not(.is-mobile) .view-content,
+body.theme-dark:not(.is-mobile) .nav-files-container {
   min-height: 0;
   justify-content: flex-start;
 }
 
 /* ---- 03a // header rows: identical geometry ---- */
-body.theme-dark .workspace-tab-header-container,
-body.theme-dark .view-header,
-body.theme-dark .nav-header {
+body.theme-dark:not(.is-mobile) .workspace-tab-header-container,
+body.theme-dark:not(.is-mobile) .view-header,
+body.theme-dark:not(.is-mobile) .nav-header {
   box-sizing: border-box;
   height: var(--header-height);
   min-height: var(--header-height);
@@ -244,23 +269,23 @@ body.theme-dark .nav-header {
   flex: 0 0 auto;
 }
 
-body.theme-dark .view-header,
-body.theme-dark .nav-buttons-container {
+body.theme-dark:not(.is-mobile) .view-header,
+body.theme-dark:not(.is-mobile) .nav-buttons-container {
   padding-inline: 10px;
 }
 
-body.theme-dark .nav-buttons-container,
-body.theme-dark .workspace-tab-header-container-inner {
+body.theme-dark:not(.is-mobile) .nav-buttons-container,
+body.theme-dark:not(.is-mobile) .workspace-tab-header-container-inner {
   height: 100%;
   min-height: 0;
   margin: 0;
 }
 
 /* ---- 03b // no stray offsets above the first row ---- */
-body.theme-dark .workspace-tab-container > .workspace-leaf,
-body.theme-dark .workspace-split.mod-root .workspace-leaf-content,
-body.theme-dark .workspace-split.mod-left-split .workspace-leaf-content,
-body.theme-dark .workspace-split.mod-right-split .workspace-leaf-content {
+body.theme-dark:not(.is-mobile) .workspace-tab-container > .workspace-leaf,
+body.theme-dark:not(.is-mobile) .workspace-split.mod-root .workspace-leaf-content,
+body.theme-dark:not(.is-mobile) .workspace-split.mod-left-split .workspace-leaf-content,
+body.theme-dark:not(.is-mobile) .workspace-split.mod-right-split .workspace-leaf-content {
   padding-top: 0;
   margin-top: 0;
   border-top: none;
@@ -297,9 +322,13 @@ body.theme-dark .workspace-split.mod-right-split .workspace-leaf-content {
   --tab-container-background: transparent;
 }
 
-/* ---- 04a // STRIP ---- */
+/* ---- 04a // STRIP ----
+   FRAGILE: no `position: relative` here. §04g blanks this
+   element's ::before and ::after, so nothing needs it — and
+   promoting it to a positioned box makes it paint above its
+   siblings, which put it over the Windows caption buttons and
+   over the iOS drawer's file list. ---- */
 body.theme-dark .workspace-tab-header-container {
-  position: relative;
   background: linear-gradient(180deg, var(--nr-chrome-top) 0%, var(--nr-black) 100%);
   border-bottom: 1px solid rgba(255, 46, 76, 0.18);
   box-shadow: none;
@@ -385,9 +414,6 @@ body.theme-dark .workspace-tabs:not(.mod-active) .workspace-tab-header.is-active
   .workspace-tab-header-inner-title {
   color: var(--nr-tab-active);
   font-weight: 700;
-  text-shadow:
-    0 0 10px rgba(34, 224, 245, 0.55),
-    0 0 22px rgba(34, 224, 245, 0.22);
 }
 
 body.theme-dark .workspace-tab-header.is-active .workspace-tab-header-inner-icon,
@@ -1272,6 +1298,9 @@ body.theme-dark hr.workspace-leaf-resize-handle::after {
 
 /* ============================================================
    17 // BUTTONS + INPUTS
+   Note: the chamfer below is a clip-path, which removes the cut
+   corners from HIT-TESTING as well as from painting. §27 resets
+   it on the window-control buttons for that reason.
    ============================================================ */
 .theme-dark button,
 .theme-dark .clickable-icon {
@@ -1871,19 +1900,25 @@ body.theme-dark {
 
 /* ============================================================
    26 // MOBILE
-   Release desktop-only locks, drop expensive effects, and carry
-   the palette onto mobile's drawer/navbar DOM.
+   Drop expensive effects and carry the palette onto mobile's
+   drawer/navbar DOM. The desktop geometry lock is NOT released
+   here — it is scoped out at source in §03, because `revert`
+   cannot hand a property back to Obsidian's stylesheet.
    ============================================================ */
 
-/* ---- 26a // RELEASE THE HEADER LOCK ---- */
-body.is-mobile.theme-dark .view-header,
-body.is-mobile.theme-dark .nav-header,
-body.is-mobile.theme-dark .workspace-tab-header-container {
-  height: auto;
-  min-height: 0;
-  max-height: none;
-  padding-top: revert;
-  padding-bottom: revert;
+/* ---- 26a // HAND THE DRAWER CHROME BACK TO OBSIDIAN ----
+   In the mobile drawer, .workspace-tab-header-container is the
+   Files/Search/Bookmarks icon row — Obsidian's own floating tab
+   switcher. §03 no longer forces its geometry and §04a no longer
+   positions it; all that's left is to stop PAINTING it, since an
+   opaque background there reads as a menu laid over the file
+   list. The main-pane strip (tablets) keeps §04a's gradient. ---- */
+body.is-mobile.theme-dark .workspace-drawer .workspace-tab-header-container,
+body.is-mobile.theme-dark .workspace-split.mod-left-split .workspace-tab-header-container,
+body.is-mobile.theme-dark .workspace-split.mod-right-split .workspace-tab-header-container {
+  background: none;
+  border-bottom: none;
+  box-shadow: none;
 }
 
 /* ---- 26b // DROP EXPENSIVE EFFECTS ---- */
@@ -1916,6 +1951,17 @@ body.is-mobile .nav-action-button,
 body.is-mobile .workspace-tab-header::after,
 body.is-mobile .tree-item-self::after {
   animation: none !important;
+}
+
+/* !important REQUIRED, same (0,5,1) reason: iOS latches :hover
+   onto the last-tapped element and keeps it there, so §24's scan
+   bands persist after a tap — and with the animation killed above
+   they lose the clip-path that made them a thin slice, leaving a
+   solid wash over the row. No hover on touch, nothing to keep. */
+body.is-mobile .workspace-tab-header::after,
+body.is-mobile .tree-item-self::after,
+body.is-mobile .nav-folder-title::after {
+  content: none !important;
 }
 
 /* ---- 26c // RESTORE TAPPABLE CONTROLS ---- */
@@ -1961,4 +2007,54 @@ body.is-mobile.theme-dark .mobile-toolbar-options-container .clickable-icon {
 body.is-mobile.theme-dark .mobile-navbar-action.is-active,
 body.is-mobile.theme-dark .mobile-toolbar-options-container .clickable-icon:active {
   color: var(--nr-holo);
+}
+
+
+/* ============================================================
+   27 // WINDOW CONTROLS  //  Windows + Linux hidden frame
+   Obsidian draws minimise/maximise/close as DOM nodes that
+   overlap the tab strip. They must stay hit-testable and must
+   not inherit §17's chamfer — clip-path removes the cut corners
+   from hit-testing as well as from painting.
+   Deliberately last in the file: source order beats §17 at equal
+   specificity, so no !important is needed here.
+   ============================================================ */
+body.theme-dark .titlebar-button-container,
+body.theme-dark .titlebar-button {
+  pointer-events: auto;
+  -webkit-app-region: no-drag;
+  app-region: no-drag;
+}
+
+body.theme-dark .titlebar-button {
+  -webkit-clip-path: none;
+  clip-path: none;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  opacity: 1;
+  text-transform: none;
+  letter-spacing: 0;
+  color: rgba(255, 46, 76, 0.72);
+  transition: color 110ms linear, background-color 110ms linear;
+}
+
+body.theme-dark .titlebar-button:hover {
+  color: var(--nr-holo);
+  background-color: rgba(255, 46, 76, 0.14);
+  box-shadow: none;
+}
+
+body.theme-dark .titlebar-button.mod-close:hover {
+  background-color: var(--nr-red);
+  color: #06080d;
+  box-shadow: none;
+}
+
+/* the strip's empty area stays draggable; tabs and controls don't */
+body.theme-dark .workspace-tab-header,
+body.theme-dark .workspace-tab-header-new-tab,
+body.theme-dark .workspace-tab-header-tab-list {
+  -webkit-app-region: no-drag;
+  app-region: no-drag;
 }
